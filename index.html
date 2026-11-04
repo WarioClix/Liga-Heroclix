@@ -42,13 +42,13 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 <div class="flex items-center space-x-3">
-                    <img src="Logo.png" alt="Planeta Primate Logo" class="h-12 w-12 object-contain rounded-lg bg-gray-800 p-1 border border-gray-700">
+                    <img src="Logo.png" alt="Planeta Primate Logo" class="h-12 w-12 object-contain rounded-lg bg-gray-800 p-1 border border-gray-700" onerror="this.style.display='none'">
                     <div>
                         <span class="text-3xl font-comic tracking-wider text-brand-accent drop-shadow">LIGA HEROCLIX</span>
                         <p class="text-xs text-gray-400 font-medium tracking-wide uppercase">Planeta Primate • Edición Especial</p>
                     </div>
                 </div>
-                <!-- Menú de navegación principal con control directo -->
+                <!-- Menú de navegación principal -->
                 <div class="flex space-x-1">
                     <button type="button" onclick="openTab('standings')" id="btn-nav-standings" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition bg-brand-accent text-black"><i class="fa-solid fa-trophy mr-1.5"></i> Clasificación</button>
                     <button type="button" onclick="openTab('rounds')" id="btn-nav-rounds" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-gray-800"><i class="fa-solid fa-calendar-days mr-1.5"></i> Jornadas</button>
@@ -74,16 +74,18 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-gray-900/80 text-gray-400 text-xs uppercase tracking-wider border-b border-gray-800">
-                                <th class="py-4 px-4 text-center w-16">Pos</th>
-                                <th class="py-4 px-6">Jugador</th>
-                                <th class="py-4 px-4 text-center">Lista HCUnits</th>
-                                <th class="py-4 px-4 text-center">Ptos Liga</th>
-                                <th class="py-4 px-4 text-center">J</th>
-                                <th class="py-4 px-4 text-center">G</th>
-                                <th class="py-4 px-4 text-center">E</th>
-                                <th class="py-4 px-4 text-center">P</th>
-                                <th class="py-4 px-4 text-center">No Presentado</th>
-                                <th class="py-4 px-4 text-center">Desempate (TP)</th>
+                                <th class="py-4 px-3 text-center w-14">Pos</th>
+                                <th class="py-4 px-4">Jugador</th>
+                                <th class="py-4 px-3 text-center">Lista HCUnits</th>
+                                <th class="py-4 px-3 text-center text-brand-accent">Ptos Liga</th>
+                                <th class="py-4 px-3 text-center">J</th>
+                                <th class="py-4 px-3 text-center text-green-400">G</th>
+                                <th class="py-4 px-3 text-center text-yellow-400">E</th>
+                                <th class="py-4 px-3 text-center text-red-400">P</th>
+                                <th class="py-4 px-3 text-center text-orange-400">NP</th>
+                                <th class="py-4 px-3 text-center">Ptos a Favor (PF)</th>
+                                <th class="py-4 px-3 text-center">Ptos en Contra (PC)</th>
+                                <th class="py-4 px-3 text-center">Dif</th>
                             </tr>
                         </thead>
                         <tbody id="standings-tbody" class="divide-y divide-gray-800 text-sm">
@@ -234,7 +236,6 @@
 
         let currentActiveRound = 1;
 
-        // Función directa para alternar pestañas del menú de forma instantánea
         function openTab(tabId) {
             const tabs = ['standings', 'rounds', 'rules', 'admin'];
             
@@ -368,56 +369,72 @@
         function calculateStandings() {
             let stats = {};
             leagueData.players.forEach(p => {
-                stats[p.name] = { name: p.name, hcunits: p.hcunits || '', pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, tp: 0 };
+                stats[p.name] = { 
+                    name: p.name, 
+                    hcunits: p.hcunits || '', 
+                    pts: 0, 
+                    played: 0, 
+                    won: 0, 
+                    drawn: 0, 
+                    lost: 0, 
+                    np: 0, 
+                    pf: 0, 
+                    pc: 0 
+                };
             });
 
             Object.values(leagueData.rounds).forEach(roundMatches => {
                 roundMatches.forEach(m => {
-                    if(!stats[m.p1]) stats[m.p1] = { name: m.p1, hcunits: '', pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, tp: 0 };
+                    if(!stats[m.p1]) stats[m.p1] = { name: m.p1, hcunits: '', pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, pf: 0, pc: 0 };
                     
+                    // --- JUGADOR 1 ---
                     if(m.status1 === 'np') {
                         stats[m.p1].np++;
-                        stats[m.p1].pts -= 1;
+                        stats[m.p1].pts -= 1; // -1 punto por no presentado
                     } else if(m.score1 !== '' && m.score2 !== '' && m.p2 !== 'DESCANSA (BYE)') {
                         stats[m.p1].played++;
-                        stats[m.p1].pts += 1;
-                        stats[m.p1].tp += m.score1;
+                        stats[m.p1].pts += 1; // +1 punto por asistencia/participación
+                        stats[m.p1].pf += Number(m.score1);
+                        stats[m.p1].pc += Number(m.score2);
 
-                        if(m.status1 === 'win' || (m.score1 > m.score2 && m.status2 !== 'np')) {
-                            stats[m.p1].pts += 3;
+                        if(m.status1 === 'win' || (Number(m.score1) > Number(m.score2) && m.status2 !== 'np')) {
+                            stats[m.p1].pts += 3; // +3 puntos por victoria
                             stats[m.p1].won++;
                         } else if(m.status2 === 'np') {
-                            stats[m.p1].pts += 3;
+                            stats[m.p1].pts += 3; // +3 puntos si el rival no se presenta
                             stats[m.p1].won++;
-                        } else if(m.score1 === m.score2) {
+                        } else if(Number(m.score1) === Number(m.score2)) {
                             stats[m.p1].drawn++;
                         } else {
                             stats[m.p1].lost++;
                         }
                     } else if(m.p2 === 'DESCANSA (BYE)' && m.score1 !== '') {
                         stats[m.p1].played++;
-                        stats[m.p1].pts += 1 + 3;
+                        stats[m.p1].pts += 1 + 3; // Participación + Victoria por BYE
                         stats[m.p1].won++;
+                        stats[m.p1].pf += Number(m.score1);
                     }
 
+                    // --- JUGADOR 2 (si no es BYE) ---
                     if(m.p2 !== 'DESCANSA (BYE)') {
-                        if(!stats[m.p2]) stats[m.p2] = { name: m.p2, hcunits: '', pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, tp: 0 };
+                        if(!stats[m.p2]) stats[m.p2] = { name: m.p2, hcunits: '', pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, pf: 0, pc: 0 };
 
                         if(m.status2 === 'np') {
                             stats[m.p2].np++;
-                            stats[m.p2].pts -= 1;
+                            stats[m.p2].pts -= 1; // -1 punto por no presentado
                         } else if(m.score1 !== '' && m.score2 !== '') {
                             stats[m.p2].played++;
-                            stats[m.p2].pts += 1;
-                            stats[m.p2].tp += m.score2;
+                            stats[m.p2].pts += 1; // +1 punto por asistencia/participación
+                            stats[m.p2].pf += Number(m.score2);
+                            stats[m.p2].pc += Number(m.score1);
 
-                            if(m.status2 === 'win' || (m.score2 > m.score1 && m.status1 !== 'np')) {
-                                stats[m.p2].pts += 3;
+                            if(m.status2 === 'win' || (Number(m.score2) > Number(m.score1) && m.status1 !== 'np')) {
+                                stats[m.p2].pts += 3; // +3 puntos por victoria
                                 stats[m.p2].won++;
                             } else if(m.status1 === 'np') {
-                                stats[m.p2].pts += 3;
+                                stats[m.p2].pts += 3; // +3 puntos si el rival no se presenta
                                 stats[m.p2].won++;
-                            } else if(m.score1 === m.score2) {
+                            } else if(Number(m.score1) === Number(m.score2)) {
                                 stats[m.p2].drawn++;
                             } else {
                                 stats[m.p2].lost++;
@@ -427,7 +444,12 @@
                 });
             });
 
-            return Object.values(stats).sort((a, b) => b.pts - a.pts || b.tp - a.tp);
+            // Convertir a array y ordenar por Puntos de Liga (descendente), luego por Diferencial de Puntos (PF - PC)
+            return Object.values(stats).sort((a, b) => {
+                const diffA = a.pf - a.pc;
+                const diffB = b.pf - b.pc;
+                return b.pts - a.pts || diffB - diffA;
+            });
         }
 
         function updateUI() {
@@ -436,24 +458,32 @@
             
             if(tbody) {
                 if(standings.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="10" class="py-6 px-4 text-center text-gray-500">No hay participantes registrados todavía.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="12" class="py-6 px-4 text-center text-gray-500">No hay participantes registrados todavía.</td></tr>`;
                 } else {
-                    tbody.innerHTML = standings.map((st, index) => `
-                        <tr class="hover:bg-gray-800/50 transition">
-                            <td class="py-3 px-4 text-center font-bold text-brand-accent">${index + 1}</td>
-                            <td class="py-3 px-6 font-semibold text-white">${st.name}</td>
-                            <td class="py-3 px-4 text-center">
-                                ${st.hcunits ? `<a href="${st.hcunits}" target="_blank" rel="noopener noreferrer" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-3 py-1 rounded-lg text-xs font-bold border border-blue-500/30 inline-flex items-center"><i class="fa-solid fa-link mr-1.5"></i> Ver Lista</a>` : `<span class="text-gray-600 text-xs">-</span>`}
-                            </td>
-                            <td class="py-3 px-4 text-center font-bold text-brand-accent">${st.pts}</td>
-                            <td class="py-3 px-4 text-center text-gray-300">${st.played}</td>
-                            <td class="py-3 px-4 text-center text-green-400">${st.won}</td>
-                            <td class="py-3 px-4 text-center text-yellow-400">${st.drawn}</td>
-                            <td class="py-3 px-4 text-center text-red-400">${st.lost}</td>
-                            <td class="py-3 px-4 text-center text-orange-400">${st.np}</td>
-                            <td class="py-3 px-4 text-center text-gray-400">${st.tp}</td>
-                        </tr>
-                    `).join('');
+                    tbody.innerHTML = standings.map((st, index) => {
+                        const diff = st.pf - st.pc;
+                        const diffFormatted = diff > 0 ? `+${diff}` : diff;
+                        const diffColor = diff > 0 ? 'text-green-400' : (diff < 0 ? 'text-red-400' : 'text-gray-400');
+
+                        return `
+                            <tr class="hover:bg-gray-800/50 transition">
+                                <td class="py-3 px-3 text-center font-bold text-brand-accent">${index + 1}</td>
+                                <td class="py-3 px-4 font-semibold text-white">${st.name}</td>
+                                <td class="py-3 px-3 text-center">
+                                    ${st.hcunits ? `<a href="${st.hcunits}" target="_blank" rel="noopener noreferrer" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-3 py-1 rounded-lg text-xs font-bold border border-blue-500/30 inline-flex items-center"><i class="fa-solid fa-link mr-1.5"></i> Ver Lista</a>` : `<span class="text-gray-600 text-xs">-</span>`}
+                                </td>
+                                <td class="py-3 px-3 text-center font-bold text-brand-accent text-base">${st.pts}</td>
+                                <td class="py-3 px-3 text-center text-gray-300">${st.played}</td>
+                                <td class="py-3 px-3 text-center text-green-400">${st.won}</td>
+                                <td class="py-3 px-3 text-center text-yellow-400">${st.drawn}</td>
+                                <td class="py-3 px-3 text-center text-red-400">${st.lost}</td>
+                                <td class="py-3 px-3 text-center text-orange-400">${st.np}</td>
+                                <td class="py-3 px-3 text-center text-blue-300 font-semibold">${st.pf}</td>
+                                <td class="py-3 px-3 text-center text-purple-300 font-semibold">${st.pc}</td>
+                                <td class="py-3 px-3 text-center font-bold ${diffColor}">${diffFormatted}</td>
+                            </tr>
+                        `;
+                    }).join('');
                 }
             }
 
@@ -560,9 +590,9 @@
                         </select>
                     </div>
                     <div class="flex items-center gap-2">
-                        <input type="number" value="${m.score1}" onchange="updateMatchScore(${roundNum}, ${idx}, this.value, document.getElementById('m${roundNum}_${idx}_p2').value)" class="w-16 bg-brand-card border border-gray-700 rounded text-center py-1 text-white font-bold">
+                        <input type="number" value="${m.score1}" onchange="updateMatchScore(${roundNum}, ${idx}, this.value, document.getElementById('m${roundNum}_${idx}_p2').value)" class="w-16 bg-brand-card border border-gray-700 rounded text-center py-1 text-white font-bold" placeholder="PF">
                         <span class="text-gray-500 font-bold">-</span>
-                        <input type="number" id="m${roundNum}_${idx}_p2" value="${m.score2}" onchange="updateMatchScore(${roundNum}, ${idx}, document.getElementById('m${roundNum}_${idx}_p1').value, this.value)" class="w-16 bg-brand-card border border-gray-700 rounded text-center py-1 text-white font-bold">
+                        <input type="number" id="m${roundNum}_${idx}_p2" value="${m.score2}" onchange="updateMatchScore(${roundNum}, ${idx}, document.getElementById('m${roundNum}_${idx}_p1').value, this.value)" class="w-16 bg-brand-card border border-gray-700 rounded text-center py-1 text-white font-bold" placeholder="PC">
                     </div>
                     <div class="w-full sm:w-1/3 flex items-center justify-start gap-2">
                         <select onchange="updateMatchStatus(${roundNum}, ${idx}, 2, this.value)" class="bg-brand-card text-xs text-gray-300 border border-gray-700 rounded p-1">

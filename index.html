@@ -45,14 +45,14 @@
                     <img src="Logo.png" alt="Planeta Primate Logo" class="h-12 w-12 object-contain rounded-lg bg-gray-800 p-1 border border-gray-700">
                     <div>
                         <span class="text-3xl font-comic tracking-wider text-brand-accent drop-shadow">LIGA HEROCLIX</span>
-                        <p class="text-xs text-gray-400 font-medium tracking-wide uppercase">Planeta Primate • 2026</p>
+                        <p class="text-xs text-gray-400 font-medium tracking-wide uppercase">Planeta Primate • Edición Especial</p>
                     </div>
                 </div>
                 <!-- Menú de navegación principal -->
                 <div class="hidden md:flex space-x-1">
                     <button onclick="switchTab('standings')" id="nav-standings" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition bg-brand-accent text-black"><i class="fa-solid fa-trophy mr-1.5"></i> Clasificación</button>
                     <button onclick="switchTab('rounds')" id="nav-rounds" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-gray-800"><i class="fa-solid fa-calendar-days mr-1.5"></i> Jornadas</button>
-                    <button onclick="switchTab('rules')" id="nav-rules" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-gray-800"><i class="fa-solid fa-book-open mr-1.5"></i> Reglamento</button>
+                    <button onclick="switchTab('rules')" id="nav-rules" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-gray-800"><i class="fa-solid fa-book-open mr-1.5"></i> Formatos y Normativa</button>
                     <button onclick="switchTab('admin')" id="nav-admin" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-gray-800"><i class="fa-solid fa-gears mr-1.5"></i> Panel Admin</button>
                 </div>
             </div>
@@ -91,9 +91,12 @@
         <!-- VISTA 2: JORNADAS -->
         <div id="view-rounds" class="view-section hidden">
             <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-                <h1 class="text-4xl font-comic text-brand-accent flex items-center"><i class="fa-solid fa-calendar-days mr-3"></i> Jornadas de la Liga (10 Rondas)</h1>
+                <div>
+                    <h1 class="text-4xl font-comic text-brand-accent flex items-center"><i class="fa-solid fa-calendar-days mr-3"></i> Jornadas de la Liga</h1>
+                    <p id="round-format-banner" class="text-brand-accent font-semibold text-sm mt-1">Formato de la jornada...</p>
+                </div>
                 <select id="round-selector" onchange="changeActiveRound(this.value)" class="bg-brand-card border border-gray-700 text-white rounded-lg px-4 py-2 font-semibold focus:outline-none focus:border-brand-accent">
-                    <!-- Se generan opciones del 1 al 10 -->
+                    <!-- Se generan opciones del 1 al 10 con sus formatos -->
                 </select>
             </div>
             
@@ -102,14 +105,11 @@
             </div>
         </div>
 
-        <!-- VISTA 3: REGLAMENTO -->
+        <!-- VISTA 3: FORMATOS Y REGLAMENTO -->
         <div id="view-rules" class="view-section hidden">
-            <h1 class="text-4xl font-comic text-brand-accent mb-6 flex items-center"><i class="fa-solid fa-book-open mr-3"></i> Reglamento y Normativa</h1>
-            <div class="bg-brand-card p-6 rounded-xl border border-gray-800 shadow-xl space-y-4 text-gray-300">
-                <h2 class="text-xl font-bold text-white">1. Formato de la Liga</h2>
-                <p>La liga consta de un total de **10 rondas** presenciales organizadas en Planeta Primate. Cada victoria otorga 3 puntos, el empate 1 punto y la derrota 0 puntos.</p>
-                <h2 class="text-xl font-bold text-white">2. Construcción de Equipos</h2>
-                <p>Consulta las restricciones de puntos y modernidad vigentes en las bases publicadas por la organización en la tienda.</p>
+            <h1 class="text-4xl font-comic text-brand-accent mb-6 flex items-center"><i class="fa-solid fa-book-open mr-3"></i> Los 10 Formatos de la Liga</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8" id="formats-grid">
+                <!-- Se inyectan los 10 formatos -->
             </div>
         </div>
 
@@ -170,18 +170,30 @@
     </main>
 
     <footer class="bg-brand-card border-t border-gray-800 py-6 text-center text-sm text-gray-500 mt-12">
-        <p>Liga Oficial HeroClix - Organizada en colaboración con Planeta Primate.</p>
+        <p>Liga Oficial HeroClix - Organizada en Planeta Primate.</p>
     </footer>
 
     <!-- Lógica de la Aplicación -->
     <script>
-        // Contraseña del administrador
         const ADMIN_PASS = "primate2026";
 
-        // Estructura de datos almacenada en localStorage
+        // Definición de los 10 formatos únicos para las 10 rondas
+        const roundFormats = {
+            1: "Jornada 1: Modern Age Estándar (300 Puntos)",
+            2: "Jornada 2: Singleton (Sin piezas repetidas en el Roster - 400 Puntos)",
+            3: "Jornada 3: Tema Libre / Theme Team Obligatorio (300 Puntos)",
+            4: "Jornada 4: Sin Recursos ni Objetivos Externos (Pura miniatura - 400 Puntos)",
+            5: "Jornada 5: Gigantes y Colosales Permitidos (500 Puntos)",
+            6: "Jornada 6: Restricción de Rarezas (Máximo 1 Súper Rara o Chase - 300 Puntos)",
+            7: "Jornada 7: Golden Age Primate (Todo legal desde la creación del juego - 400 Puntos)",
+            8: "Jornada 8: Equipos Monofacción (Todas las figuras deben compartir una keyword - 300 Puntos)",
+            9: "Jornada 9: Estilo Libre Sin Límite de Recursos (Todo vale - 500 Puntos)",
+            10: "Jornada 10: Gran Final de Maestros (400 Puntos - Formato Cerrado)"
+        };
+
         let leagueData = JSON.parse(localStorage.getItem('heroclix_league_data')) || {
-            players: [], // Ej: { id: 1, name: "Jugador 1" }
-            rounds: {}   // Ej: { 1: [ { player1: "A", player2: "B", score1: null, score2: null } ] }
+            players: [],
+            rounds: {}
         };
 
         let currentActiveRound = 1;
@@ -203,7 +215,6 @@
             updateUI();
         }
 
-        // --- SISTEMA DE ADMIN ---
         function handleAdminLogin(e) {
             e.preventDefault();
             const pass = document.getElementById('admin-password-input').value;
@@ -240,7 +251,6 @@
             updateAdminUI();
         }
 
-        // --- EMPAREJAMIENTOS ---
         function generatePairings() {
             const roundNum = document.getElementById('admin-round-select').value;
             const players = [...leagueData.players];
@@ -250,7 +260,6 @@
                 return;
             }
 
-            // Mezclar jugadores aleatoriamente
             for (let i = players.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [players[i], players[j]] = [players[j], players[i]];
@@ -266,7 +275,6 @@
                         score2: ''
                     });
                 } else {
-                    // Bye / Descansa
                     matches.push({
                         p1: players[i].name,
                         p2: 'DESCANSA (BYE)',
@@ -289,14 +297,12 @@
             }
         }
 
-        // --- CÁLCULO DE CLASIFICACIÓN ---
         function calculateStandings() {
             let stats = {};
             leagueData.players.forEach(p => {
                 stats[p.name] = { name: p.name, pts: 0, played: 0, won: 0, drawn: 0, lost: 0, tp: 0 };
             });
 
-            // Recorrer todas las rondas guardadas
             Object.values(leagueData.rounds).forEach(roundMatches => {
                 roundMatches.forEach(m => {
                     if(m.score1 !== '' && m.score2 !== '' && m.p2 !== 'DESCANSA (BYE)') {
@@ -331,9 +337,8 @@
             return Object.values(stats).sort((a, b) => b.pts - a.pts || b.tp - a.tp);
         }
 
-        // --- RENDERIZADO DE INTERFACES ---
         function updateUI() {
-            // 1. Renderizar tabla de clasificación
+            // 1. Clasificación
             const tbody = document.getElementById('standings-tbody');
             const standings = calculateStandings();
             
@@ -354,14 +359,15 @@
                 `).join('');
             }
 
-            // 2. Renderizar selector de rondas públicas
+            // 2. Selector de Rondas y Banner de Formato
             let roundOptionsHtml = '';
             for(let i=1; i<=10; i++) {
                 roundOptionsHtml += `<option value="${i}" ${currentActiveRound == i ? 'selected' : ''}>Jornada ${i}</option>`;
             }
             document.getElementById('round-selector').innerHTML = roundOptionsHtml;
+            document.getElementById('round-format-banner').innerText = roundFormats[currentActiveRound];
 
-            // 3. Renderizar partidos públicos de la jornada activa
+            // 3. Partidos públicos
             const roundsContainer = document.getElementById('rounds-container');
             const currentMatches = leagueData.rounds[currentActiveRound] || [];
             
@@ -378,6 +384,24 @@
                     </div>
                 `).join('') + `</div>`;
             }
+
+            // 4. Renderizar la cuadrícula de los 10 formatos en la pestaña de Reglamento
+            const formatsGrid = document.getElementById('formats-grid');
+            if(formatsGrid) {
+                let formatsHtml = '';
+                for(let i=1; i<=10; i++) {
+                    formatsHtml += `
+                        <div class="bg-brand-card p-4 rounded-xl border border-gray-800 flex items-start space-x-3">
+                            <span class="bg-brand-accent text-black font-bold px-3 py-1 rounded-lg text-sm">R${i}</span>
+                            <div>
+                                <h3 class="text-white font-bold">Jornada ${i}</h3>
+                                <p class="text-sm text-gray-400">${roundFormats[i].split(': ')[1]}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+                formatsGrid.innerHTML = formatsHtml;
+            }
         }
 
         function changeActiveRound(roundVal) {
@@ -386,7 +410,6 @@
         }
 
         function updateAdminUI() {
-            // Lista de jugadores en admin
             const adminPlayersList = document.getElementById('admin-players-list');
             if(leagueData.players.length === 0) {
                 adminPlayersList.innerHTML = `<p class="text-sm text-gray-500 col-span-full">Aún no hay jugadores añadidos.</p>`;
@@ -399,10 +422,9 @@
                 `).join('');
             }
 
-            // Selector de rondas en admin
             let adminRoundSelectOpts = '';
             for(let i=1; i<=10; i++) {
-                adminRoundSelectOpts += `<option value="${i}">Jornada ${i}</option>`;
+                adminRoundSelectOpts += `<option value="${i}">Jornada ${i} - ${roundFormats[i].split(': ')[1]}</option>`;
             }
             const adminSelectElem = document.getElementById('admin-round-select');
             const selectedVal = adminSelectElem.value || 1;
@@ -412,7 +434,7 @@
             renderAdminMatches(selectedVal);
         }
 
-            function renderAdminMatches(roundNum) {
+        function renderAdminMatches(roundNum) {
             const container = document.getElementById('admin-matches-container');
             const matches = leagueData.rounds[roundNum] || [];
 
@@ -434,7 +456,6 @@
             `).join('');
         }
 
-        // Inicializar al cargar
         updateUI();
     </script>
 </body>

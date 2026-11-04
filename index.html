@@ -77,6 +77,7 @@
                                 <th class="py-4 px-4 text-center">G</th>
                                 <th class="py-4 px-4 text-center">E</th>
                                 <th class="py-4 px-4 text-center">P</th>
+                                <th class="py-4 px-4 text-center">No Presentado</th>
                                 <th class="py-4 px-4 text-center">Desempate (TP)</th>
                             </tr>
                         </thead>
@@ -96,18 +97,39 @@
                     <p id="round-format-banner" class="text-brand-accent font-semibold text-sm mt-1">Formato de la jornada...</p>
                 </div>
                 <select id="round-selector" onchange="changeActiveRound(this.value)" class="bg-brand-card border border-gray-700 text-white rounded-lg px-4 py-2 font-semibold focus:outline-none focus:border-brand-accent">
-                    <!-- Se generan opciones del 1 al 10 con sus formatos -->
+                    <!-- Opciones del 1 al 10 -->
                 </select>
             </div>
             
             <div id="rounds-container" class="space-y-4">
-                <!-- Contenido de emparejamientos de la jornada activa -->
+                <!-- Emparejamientos de la jornada activa -->
             </div>
         </div>
 
         <!-- VISTA 3: FORMATOS Y REGLAMENTO -->
         <div id="view-rules" class="view-section hidden">
-            <h1 class="text-4xl font-comic text-brand-accent mb-6 flex items-center"><i class="fa-solid fa-book-open mr-3"></i> Los 10 Formatos de la Liga</h1>
+            <h1 class="text-4xl font-comic text-brand-accent mb-6 flex items-center"><i class="fa-solid fa-book-open mr-3"></i> Sistema de Puntuación y Formatos</h1>
+            
+            <!-- Caja de Puntuación -->
+            <div class="bg-brand-card p-6 rounded-xl border border-gray-800 shadow-xl mb-8">
+                <h2 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-star text-brand-accent mr-2"></i> Sistema de Puntuación Oficial</h2>
+                <ul class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-300">
+                    <li class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+                        <span class="block text-brand-accent font-bold text-lg">+1 Punto</span>
+                        Por asistir y disputar la jornada.
+                    </li>
+                    <li class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+                        <span class="block text-green-400 font-bold text-lg">+3 Puntos</span>
+                        Por conseguir la victoria en el encuentro.
+                    </li>
+                    <li class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+                        <span class="block text-red-400 font-bold text-lg">-1 Punto</span>
+                        Sanción por no presentarse (Default).
+                    </li>
+                </ul>
+            </div>
+
+            <h2 class="text-2xl font-comic text-brand-accent mb-4">Los 10 Formatos de la Liga</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8" id="formats-grid">
                 <!-- Se inyectan los 10 formatos -->
             </div>
@@ -115,7 +137,6 @@
 
         <!-- VISTA 4: PANEL DE ADMINISTRADOR -->
         <div id="view-admin" class="view-section hidden">
-            <!-- Bloque de Login de Admin -->
             <div id="admin-login-container" class="max-w-md mx-auto bg-brand-card p-8 rounded-xl border border-gray-800 shadow-xl mt-12">
                 <h2 class="text-3xl font-comic text-brand-purple mb-4 text-center"><i class="fa-solid fa-lock mr-2"></i> Acceso Administrador</h2>
                 <p class="text-sm text-gray-400 mb-6 text-center">Introduce la contraseña de la organización para gestionar la liga.</p>
@@ -128,12 +149,11 @@
                 </form>
             </div>
 
-            <!-- Panel de Gestión Protegido -->
             <div id="admin-dashboard" class="hidden space-y-8">
                 <div class="flex items-center justify-between bg-brand-card p-6 rounded-xl border border-gray-800">
                     <div>
                         <h2 class="text-3xl font-comic text-brand-purple">Panel de Control de Administrador</h2>
-                        <p class="text-sm text-gray-400">Gestiona los participantes de la liga y registra los emparejamientos por ronda.</p>
+                        <p class="text-sm text-gray-400">Gestiona los participantes y registra resultados o penalizaciones por incomparecencia.</p>
                     </div>
                     <button onclick="handleAdminLogout()" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded-lg text-sm font-semibold border border-red-500/30 transition"><i class="fa-solid fa-right-from-bracket mr-2"></i> Cerrar Sesión</button>
                 </div>
@@ -146,14 +166,14 @@
                         <button type="submit" class="bg-brand-accent hover:bg-amber-600 text-black font-bold px-6 py-2 rounded-lg transition"><i class="fa-solid fa-user-plus mr-1"></i> Añadir Jugador</button>
                     </form>
                     <div id="admin-players-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                        <!-- Lista de jugadores para borrar o ver -->
+                        <!-- Lista de jugadores -->
                     </div>
                 </div>
 
                 <!-- Gestión de Rondas y Resultados -->
                 <div class="bg-brand-card p-6 rounded-xl border border-gray-800 shadow-xl">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-                        <h3 class="text-xl font-bold text-white"><i class="fa-solid fa-clipboard-user mr-2 text-brand-blue"></i> Generación de Emparejamientos y Resultados</h3>
+                        <h3 class="text-xl font-bold text-white"><i class="fa-solid fa-clipboard-user mr-2 text-brand-blue"></i> Emparejamientos y Resultados</h3>
                         <div class="flex gap-2">
                             <select id="admin-round-select" onchange="renderAdminMatches(this.value)" class="bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-1.5 text-sm font-semibold focus:outline-none">
                             </select>
@@ -161,7 +181,7 @@
                         </div>
                     </div>
                     <div id="admin-matches-container" class="space-y-4">
-                        <!-- Partidos de la jornada seleccionada en admin -->
+                        <!-- Partidos de la jornada -->
                     </div>
                 </div>
             </div>
@@ -177,7 +197,6 @@
     <script>
         const ADMIN_PASS = "primate2026";
 
-        // Definición de los 10 formatos únicos para las 10 rondas
         const roundFormats = {
             1: "Jornada 1: Modern Age Estándar (300 Puntos)",
             2: "Jornada 2: Singleton (Sin piezas repetidas en el Roster - 400 Puntos)",
@@ -271,6 +290,8 @@
                     matches.push({
                         p1: players[i].name,
                         p2: players[i+1].name,
+                        status1: 'normal', // normal, win, np (no presentado)
+                        status2: 'normal',
                         score1: '',
                         score2: ''
                     });
@@ -278,6 +299,8 @@
                     matches.push({
                         p1: players[i].name,
                         p2: 'DESCANSA (BYE)',
+                        status1: 'win',
+                        status2: 'bye',
                         score1: 3,
                         score2: 0
                     });
@@ -285,6 +308,19 @@
             }
 
             leagueData.rounds[roundNum] = matches;
+            saveData();
+            renderAdminMatches(roundNum);
+        }
+
+        function updateMatchStatus(roundNum, matchIdx, playerNum, statusVal) {
+            let match = leagueData.rounds[roundNum][matchIdx];
+            if(playerNum === 1) {
+                match.status1 = statusVal;
+                if(statusVal === 'np') match.score1 = 0;
+            } else {
+                match.status2 = statusVal;
+                if(statusVal === 'np') match.score2 = 0;
+            }
             saveData();
             renderAdminMatches(roundNum);
         }
@@ -297,39 +333,67 @@
             }
         }
 
+        // --- CÁLCULO DE PUNTUACIÓN SEGÚN REGLAS ---
         function calculateStandings() {
             let stats = {};
             leagueData.players.forEach(p => {
-                stats[p.name] = { name: p.name, pts: 0, played: 0, won: 0, drawn: 0, lost: 0, tp: 0 };
+                stats[p.name] = { name: p.name, pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, tp: 0 };
             });
 
             Object.values(leagueData.rounds).forEach(roundMatches => {
                 roundMatches.forEach(m => {
-                    if(m.score1 !== '' && m.score2 !== '' && m.p2 !== 'DESCANSA (BYE)') {
-                        if(!stats[m.p1]) stats[m.p1] = { name: m.p1, pts: 0, played: 0, won: 0, drawn: 0, lost: 0, tp: 0 };
-                        if(!stats[m.p2]) stats[m.p2] = { name: m.p2, pts: 0, played: 0, won: 0, drawn: 0, lost: 0, tp: 0 };
-
+                    // Procesar Jugador 1
+                    if(!stats[m.p1]) stats[m.p1] = { name: m.p1, pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, tp: 0 };
+                    
+                    if(m.status1 === 'np') {
+                        stats[m.p1].np++;
+                        stats[m.p1].pts -= 1; // -1 por no presentarse
+                    } else if(m.score1 !== '' && m.score2 !== '' && m.p2 !== 'DESCANSA (BYE)') {
                         stats[m.p1].played++;
-                        stats[m.p2].played++;
-
+                        stats[m.p1].pts += 1; // +1 por asistir
                         stats[m.p1].tp += m.score1;
-                        stats[m.p2].tp += m.score2;
 
-                        if(m.score1 > m.score2) {
-                            stats[m.p1].pts += 3; stats[m.p1].won++;
-                            stats[m.p2].lost++;
-                        } else if(m.score1 < m.score2) {
-                            stats[m.p2].pts += 3; stats[m.p2].won++;
-                            stats[m.p1].lost++;
+                        if(m.status1 === 'win' || (m.score1 > m.score2 && m.status2 !== 'np')) {
+                            stats[m.p1].pts += 3; // +3 por victoria
+                            stats[m.p1].won++;
+                        } else if(m.status2 === 'np') {
+                            stats[m.p1].pts += 3; // Victoria por incomparecencia rival
+                            stats[m.p1].won++;
+                        } else if(m.score1 === m.score2) {
+                            stats[m.p1].drawn++;
                         } else {
-                            stats[m.p1].pts += 1; stats[m.p1].drawn++;
-                            stats[m.p2].pts += 1; stats[m.p2].drawn++;
+                            stats[m.p1].lost++;
                         }
                     } else if(m.p2 === 'DESCANSA (BYE)' && m.score1 !== '') {
-                        if(!stats[m.p1]) stats[m.p1] = { name: m.p1, pts: 0, played: 0, won: 0, drawn: 0, lost: 0, tp: 0 };
                         stats[m.p1].played++;
-                        stats[m.p1].pts += 3;
+                        stats[m.p1].pts += 1 + 3; // Asistencia + Victoria automática por bye
                         stats[m.p1].won++;
+                    }
+
+                    // Procesar Jugador 2 (si no es BYE)
+                    if(m.p2 !== 'DESCANSA (BYE)') {
+                        if(!stats[m.p2]) stats[m.p2] = { name: m.p2, pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, tp: 0 };
+
+                        if(m.status2 === 'np') {
+                            stats[m.p2].np++;
+                            stats[m.p2].pts -= 1; // -1 por no presentarse
+                        } else if(m.score1 !== '' && m.score2 !== '') {
+                            stats[m.p2].played++;
+                            stats[m.p2].pts += 1; // +1 por asistir
+                            stats[m.p2].tp += m.score2;
+
+                            if(m.status2 === 'win' || (m.score2 > m.score1 && m.status1 !== 'np')) {
+                                stats[m.p2].pts += 3; // +3 por victoria
+                                stats[m.p2].won++;
+                            } else if(m.status1 === 'np') {
+                                stats[m.p2].pts += 3; // Victoria por incomparecencia rival
+                                stats[m.p2].won++;
+                            } else if(m.score1 === m.score2) {
+                                stats[m.p2].drawn++;
+                            } else {
+                                stats[m.p2].lost++;
+                            }
+                        }
                     }
                 });
             });
@@ -343,7 +407,7 @@
             const standings = calculateStandings();
             
             if(standings.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="py-6 px-4 text-center text-gray-500">No hay participantes registrados todavía.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="py-6 px-4 text-center text-gray-500">No hay participantes registrados todavía.</td></tr>`;
             } else {
                 tbody.innerHTML = standings.map((st, index) => `
                     <tr class="hover:bg-gray-800/50 transition">
@@ -354,12 +418,13 @@
                         <td class="py-3 px-4 text-center text-green-400">${st.won}</td>
                         <td class="py-3 px-4 text-center text-yellow-400">${st.drawn}</td>
                         <td class="py-3 px-4 text-center text-red-400">${st.lost}</td>
+                        <td class="py-3 px-4 text-center text-orange-400">${st.np}</td>
                         <td class="py-3 px-4 text-center text-gray-400">${st.tp}</td>
                     </tr>
                 `).join('');
             }
 
-            // 2. Selector de Rondas y Banner de Formato
+            // 2. Selector de Rondas
             let roundOptionsHtml = '';
             for(let i=1; i<=10; i++) {
                 roundOptionsHtml += `<option value="${i}" ${currentActiveRound == i ? 'selected' : ''}>Jornada ${i}</option>`;
@@ -376,16 +441,16 @@
             } else {
                 roundsContainer.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">` + currentMatches.map(m => `
                     <div class="bg-brand-card p-4 rounded-xl border border-gray-800 flex items-center justify-between shadow">
-                        <div class="flex-grow text-right pr-4 font-semibold text-white">${m.p1}</div>
+                        <div class="flex-grow text-right pr-4 font-semibold text-white ${m.status1 === 'np' ? 'line-through text-red-400' : ''}">${m.p1} ${m.status1 === 'np' ? '(No Presentado)' : ''}</div>
                         <div class="bg-gray-900 px-4 py-2 rounded-lg border border-gray-700 text-brand-accent font-bold tracking-widest text-center min-w-[90px]">
                             ${m.score1 !== '' ? m.score1 : '-'} : ${m.score2 !== '' ? m.score2 : '-'}
                         </div>
-                        <div class="flex-grow text-left pl-4 font-semibold text-white">${m.p2}</div>
+                        <div class="flex-grow text-left pl-4 font-semibold text-white ${m.status2 === 'np' ? 'line-through text-red-400' : ''}">${m.p2} ${m.status2 === 'np' ? '(No Presentado)' : ''}</div>
                     </div>
                 `).join('') + `</div>`;
             }
 
-            // 4. Renderizar la cuadrícula de los 10 formatos en la pestaña de Reglamento
+            // 4. Formatos
             const formatsGrid = document.getElementById('formats-grid');
             if(formatsGrid) {
                 let formatsHtml = '';
@@ -445,13 +510,25 @@
 
             container.innerHTML = matches.map((m, idx) => `
                 <div class="bg-gray-900 p-4 rounded-lg border border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div class="w-full sm:w-1/3 text-right font-semibold text-white">${m.p1}</div>
+                    <div class="w-full sm:w-1/3 flex items-center justify-end gap-2">
+                        <span class="font-semibold text-white">${m.p1}</span>
+                        <select onchange="updateMatchStatus(${roundNum}, ${idx}, 1, this.value)" class="bg-brand-card text-xs text-gray-300 border border-gray-700 rounded p-1">
+                            <option value="normal" ${m.status1 === 'normal' ? 'selected' : ''}>Jugó</option>
+                            <option value="np" ${m.status1 === 'np' ? 'selected' : ''}>No Presentado (-1)</option>
+                        </select>
+                    </div>
                     <div class="flex items-center gap-2">
                         <input type="number" value="${m.score1}" onchange="updateMatchScore(${roundNum}, ${idx}, this.value, document.getElementById('m${roundNum}_${idx}_p2').value)" class="w-16 bg-brand-card border border-gray-700 rounded text-center py-1 text-white font-bold">
                         <span class="text-gray-500 font-bold">-</span>
                         <input type="number" id="m${roundNum}_${idx}_p2" value="${m.score2}" onchange="updateMatchScore(${roundNum}, ${idx}, document.getElementById('m${roundNum}_${idx}_p1').value, this.value)" class="w-16 bg-brand-card border border-gray-700 rounded text-center py-1 text-white font-bold">
                     </div>
-                    <div class="w-full sm:w-1/3 text-left font-semibold text-white">${m.p2}</div>
+                    <div class="w-full sm:w-1/3 flex items-center justify-start gap-2">
+                        <select onchange="updateMatchStatus(${roundNum}, ${idx}, 2, this.value)" class="bg-brand-card text-xs text-gray-300 border border-gray-700 rounded p-1">
+                            <option value="normal" ${m.status2 === 'normal' ? 'selected' : ''}>Jugó</option>
+                            <option value="np" ${m.status2 === 'np' ? 'selected' : ''}>No Presentado (-1)</option>
+                        </select>
+                        <span class="font-semibold text-white">${m.p2}</span>
+                    </div>
                 </div>
             `).join('');
         }

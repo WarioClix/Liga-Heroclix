@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga HeroClix - Planeta Primate</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#090d16',
+                            card: '#111827',
+                            accent: '#f59e0b', // Hero Yellow
+                            red: '#ef4444',    // Hero Red
+                            blue: '#3b82f6',   // Hero Blue
+                            green: '#10b981',  // Victory Green
+                            purple: '#a855f7'  // Admin Purple
+                        }
+                    },
+                    fontFamily: {
+                        comic: ['Bangers', 'cursive'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .comic-border {
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.8);
+            border: 2px solid #000;
+        }
+        .comic-text-shadow {
+            text-shadow: 2px 2px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f59e0b;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col selection:bg-brand-accent selection:text-slate-950">
+
+    <!-- HEADER / HERO -->
+    <header class="bg-slate-900 border-b border-slate-800 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4 text-center md:text-left">
+                    <div class="w-14 h-14 bg-brand-accent rounded-xl comic-border flex items-center justify-center text-slate-950 font-comic text-2xl font-bold transform -rotate-3 hover:rotate-0 transition-transform">
+                        <i class="fa-solid fa-shield-halved text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="inline-flex items-center gap-2 mb-0.5">
+                            <span class="bg-brand-red text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider comic-border">
+                                Planeta Primate
+                            </span>
+                            <span id="admin-mode-indicator" class="hidden bg-brand-purple text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+                                <i class="fa-solid fa-user-shield mr-1"></i>Modo Admin Activo
+                            </span>
+                        </div>
+                        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-comic tracking-wide text-brand-accent comic-text-shadow">
+                            LIGA HEROCLIX <span class="text-white">PANEL OFICIAL</span>
+                        </h1>
+                    </div>
+                </div>
+
+                <!-- Stats Badge & Admin Toggle -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs">
+                        <div class="text-center px-2.5 border-r border-slate-800">
+                            <span class="block text-[10px] text-slate-400 font-bold uppercase">Jugadores</span>
+                            <span id="stat-players-count" class="text-lg font-bold text-brand-accent font-comic">0</span>
+                        </div>
+                        <div class="text-center px-2.5 border-r border-slate-800">
+                            <span class="block text-[10px] text-slate-400 font-bold uppercase">Jornadas</span>
+                            <span class="text-lg font-bold text-brand-blue font-comic">10</span>
+                        </div>
+                        <div class="text-center px-2.5">
+                            <span class="block text-[10px] text-slate-400 font-bold uppercase">Partidas</span>
+                            <span id="stat-matches-count" class="text-lg font-bold text-brand-green font-comic">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Admin Toggle Button -->
+                    <button onclick="toggleAdminMode()" id="admin-toggle-btn" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-key text-brand-purple"></i>
+                        <span id="admin-toggle-text">Admin Mode</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- NAV TABS -->
+        <div class="bg-slate-900/90 border-t border-slate-800 backdrop-blur-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <nav class="flex space-x-2 sm:space-x-4 overflow-x-auto py-2.5 no-scrollbar">
+                    <button onclick="switchTab('clasificacion')" id="tab-btn-clasificacion" class="nav-tab active-tab flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border border-transparent bg-slate-800 text-white border-brand-accent">
+                        <i class="fa-solid fa-trophy text-brand-accent"></i>
+                        <span>Clasificación</span>
+                    </button>
+                    <button onclick="switchTab('jornadas')" id="tab-btn-jornadas" class="nav-tab flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border border-transparent text-slate-400 hover:text-white hover:bg-slate-800">
+                        <i class="fa-solid fa-calendar-days text-brand-blue"></i>
+                        <span>Jornadas & Resultados</span>
+                    </button>
+                    <button onclick="switchTab('formatos')" id="tab-btn-formatos" class="nav-tab flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border border-transparent text-slate-400 hover:text-white hover:bg-slate-800">
+                        <i class="fa-solid fa-scroll text-brand-accent"></i>
+                        <span>10 Formatos</span>
+                    </button>
+                    <button onclick="switchTab('admin')" id="tab-btn-admin" class="nav-tab flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border border-transparent text-slate-400 hover:text-white hover:bg-slate-800">
+                        <i class="fa-solid fa-sliders text-brand-purple"></i>
+                        <span>Gestión Liga (Admin)</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- TAB 1: CLASIFICACIÓN GENERAL -->
+        <section id="tab-clasificacion" class="tab-content block space-y-5">
+            <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <div class="relative flex-grow max-w-md">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="search-player" oninput="renderLeaderboard()" placeholder="Buscar jugador..." class="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-4 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-accent transition-colors">
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="openModalAddPlayer()" class="admin-only hidden px-3 py-2 bg-brand-green hover:bg-emerald-600 text-slate-950 font-bold text-xs rounded-lg transition-colors flex items-center gap-1.5">
+                        <i class="fa-solid fa-user-plus"></i> Añadir Jugador
+                    </button>
+                    <div class="text-xs text-slate-400 bg-slate-950 px-3 py-2 rounded-lg border border-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-brand-accent"></i>
+                        <span>Desempate: Pts Liga &gt; Pts KO &gt; PG</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-950 text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800">
+                            <tr>
+                                <th class="py-3.5 px-4 text-center">Pos</th>
+                                <th class="py-3.5 px-4">Jugador</th>
+                                <th class="py-3.5 px-4">Alias / Ficción</th>
+                                <th class="py-3.5 px-4 text-center bg-slate-900 text-brand-accent font-black">Pts Liga</th>
+                                <th class="py-3.5 px-4 text-center">Pts Victory (KO)</th>
+                                <th class="py-3.5 px-4 text-center">Pts Contra</th>
+                                <th class="py-3.5 px-4 text-center">PJ</th>
+                                <th class="py-3.5 px-4 text-center text-brand-green">PG</th>
+                                <th class="py-3.5 px-4 text-center text-brand-red">PP</th>
+                                <th class="py-3.5 px-4 text-center">Efectividad</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-tbody" class="divide-y divide-slate-800/60">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: JORNADAS Y EMPAREJAMIENTOS -->
+        <section id="tab-jornadas" class="tab-content hidden space-y-5">
+            <!-- Selector de Jornada -->
+            <div class="flex items-center justify-between bg-slate-900 p-4 rounded-xl border border-slate-800 flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold uppercase text-slate-400">Jornada:</span>
+                    <select id="jornada-select" onchange="renderJornadaDetails()" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-brand-accent font-bold font-comic text-base focus:outline-none focus:border-brand-accent cursor-pointer">
+                        <!-- JS 1 to 10 -->
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="changeJornada(-1)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg font-bold text-xs transition-colors border border-slate-700">
+                        <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+                    </button>
+                    <button onclick="changeJornada(1)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg font-bold text-xs transition-colors border border-slate-700">
+                        Siguiente <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card Formato de Jornada -->
+            <div id="formato-card" class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-800 p-5 rounded-xl border border-slate-800 relative overflow-hidden">
+                <div class="flex items-center justify-between flex-wrap gap-2 mb-2">
+                    <span id="formato-jornada-badge" class="bg-brand-accent text-slate-950 font-comic font-bold text-xs px-2.5 py-0.5 rounded uppercase">
+                        Jornada 1
+                    </span>
+                    <span id="formato-puntos-tag" class="text-xs font-bold bg-slate-800 text-brand-accent px-2.5 py-0.5 rounded border border-slate-700">
+                        300 Puntos
+                    </span>
+                </div>
+                <h2 id="formato-titulo" class="text-xl sm:text-2xl font-comic text-white tracking-wide my-1">
+                    Nombre Formato
+                </h2>
+                <p id="formato-descripcion" class="text-slate-300 text-xs sm:text-sm max-w-3xl leading-relaxed mt-1">
+                    Descripción del formato...
+                </p>
+            </div>
+
+            <!-- Matching Actions & Pairings -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <h3 class="text-lg font-comic tracking-wide text-brand-accent flex items-center gap-2">
+                        <i class="fa-solid fa-swords text-brand-red"></i>
+                        <span>Emparejamientos y Mesas</span>
+                    </h3>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="generateSwissPairingsForCurrentJornada()" class="admin-only hidden px-3 py-1.5 bg-brand-purple hover:bg-purple-600 text-white font-bold text-xs rounded-lg transition-colors flex items-center gap-1.5 shadow-md">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Generar Emparejamientos
+                        </button>
+                        <span id="jornada-completion-status" class="text-xs font-bold text-slate-400 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
+                            Estado: 0/0 Partidas
+                        </span>
+                    </div>
+                </div>
+
+                <div id="matchups-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Cards de Enfrentamiento JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: LISTA Y EDICIÓN DE FORMATOS -->
+        <section id="tab-formatos" class="tab-content hidden space-y-4">
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-comic text-brand-accent">Formatos de las 10 Jornadas</h2>
+                    <p class="text-xs text-slate-400">Puntajes y reglas preestablecidas para la temporada.</p>
+                </div>
+            </div>
+
+            <div id="formatos-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- JS Populated -->
+            </div>
+        </section>
+
+        <!-- TAB 4: PANEL ADMIN Y CONFIGURACIÓN -->
+        <section id="tab-admin" class="tab-content hidden space-y-6">
+            
+            <!-- Quick Lock Banner if not admin -->
+            <div id="admin-lock-banner" class="bg-slate-900 border border-brand-purple/40 p-5 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-brand-purple/20 text-brand-purple flex items-center justify-center font-bold text-xl">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm text-white">Modo Administrador</h3>
+                        <p class="text-xs text-slate-400">Activa el modo admin para agregar jugadores, generar emparejamientos y registrar resultados.</p>
+                    </div>
+                </div>
+                <button onclick="toggleAdminMode()" class="px-4 py-2 bg-brand-purple hover:bg-purple-600 text-white font-bold text-xs rounded-lg transition-colors whitespace-nowrap">
+                    Activar Modo Admin
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- GESTIÓN DE JUGADORES -->
+                <div class="lg:col-span-1 bg-slate-900 p-5 rounded-xl border border-slate-800 space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h3 class="font-comic text-lg text-brand-accent flex items-center gap-2">
+                            <i class="fa-solid fa-users"></i> Jugadores Inscritos (<span id="admin-players-count">0</span>)
+                        </h3>
+                        <button onclick="openModalAddPlayer()" class="admin-only hidden px-2.5 py-1 bg-brand-green text-slate-950 font-bold text-xs rounded hover:bg-emerald-500 transition-colors">
+                            + Añadir
+                        </button>
+                    </div>
+
+                    <div id="admin-players-list" class="space-y-2 max-h-96 overflow-y-auto pr-1">
+                        <!-- JS populated player cards -->
+                    </div>
+                </div>
+
+                <!-- REGISTRO DIRECTO DE RESULTADOS -->
+                <div class="lg:col-span-2 bg-slate-900 p-5 rounded-xl border border-slate-800 space-y-4">
+                    <h3 class="font-comic text-lg text-brand-purple flex items-center gap-2 border-b border-slate-800 pb-3">
+                        <i class="fa-solid fa-pen-to-square"></i> Anotar Resultado de Mesa
+                    </h3>
+
+                    <form id="result-form" onsubmit="saveMatchResultAdmin(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">Jornada</label>
+                                <select id="admin-jornada-select" onchange="populateAdminMatchSelect()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 text-xs focus:border-brand-purple outline-none">
+                                    <!-- JS Populated -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">Mesa / Enfrentamiento</label>
+                                <select id="admin-match-select" onchange="loadSelectedMatchData()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 text-xs focus:border-brand-purple outline-none">
+                                    <!-- JS Populated -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 space-y-2">
+                                <span id="admin-p1-name" class="font-bold text-brand-accent block text-xs">Jugador 1</span>
+                                <div>
+                                    <label class="block text-[10px] text-slate-500 mb-1">Puntos KO eliminados al rival</label>
+                                    <input type="number" id="admin-p1-score" min="0" max="1000" placeholder="Ej. 300" class="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-100 text-xs focus:border-brand-accent outline-none">
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 space-y-2">
+                                <span id="admin-p2-name" class="font-bold text-brand-blue block text-xs">Jugador 2</span>
+                                <div>
+                                    <label class="block text-[10px] text-slate-500 mb-1">Puntos KO eliminados al rival</label>
+                                    <input type="number" id="admin-p2-score" min="0" max="1000" placeholder="Ej. 150" class="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-100 text-xs focus:border-brand-blue outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-2">
+                            <button type="submit" class="admin-only hidden px-5 py-2 bg-brand-purple hover:bg-purple-600 text-white font-bold text-xs rounded-lg transition-colors">
+                                <i class="fa-solid fa-floppy-disk mr-1"></i> Guardar Resultado
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- BACKUP & EXPORT SECTION -->
+                    <div class="border-t border-slate-800 pt-4 space-y-3">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Copia de Seguridad & Servidor</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="exportData()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg border border-slate-700 transition-colors flex items-center gap-1.5">
+                                <i class="fa-solid fa-download text-brand-blue"></i> Exportar Liga (JSON)
+                            </button>
+                            <button onclick="document.getElementById('import-file-input').click()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg border border-slate-700 transition-colors flex items-center gap-1.5">
+                                <i class="fa-solid fa-upload text-brand-green"></i> Importar JSON
+                            </button>
+                            <input type="file" id="import-file-input" class="hidden" accept=".json" onchange="importData(event)">
+                            <button onclick="resetLigaData()" class="admin-only hidden px-3 py-2 bg-slate-800 hover:bg-red-900/50 text-brand-red text-xs font-bold rounded-lg border border-slate-700 transition-colors flex items-center gap-1.5">
+                                <i class="fa-solid fa-trash-can"></i> Vaciar / Reiniciar Liga
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL: AÑADIR/EDITAR JUGADOR -->
+    <div id="modal-player" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 id="modal-player-title" class="font-comic text-xl text-brand-accent">Añadir Nuevo Jugador</h3>
+                <button onclick="closeModalPlayer()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+            </div>
+            <form onsubmit="savePlayerFromModal(event)" class="space-y-3">
+                <input type="hidden" id="modal-player-id" value="">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Nombre Completo *</label>
+                    <input type="text" id="modal-player-nombre" required placeholder="Ej. Carlos Rodríguez" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:border-brand-accent outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Alias / Personaje Favorito</label>
+                    <input type="text" id="modal-player-alias" placeholder="Ej. Magneto" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:border-brand-accent outline-none">
+                </div>
+                <div class="flex justify-end gap-2 pt-3">
+                    <button type="button" onclick="closeModalPlayer()" class="px-4 py-2 bg-slate-800 text-slate-300 font-bold text-xs rounded-lg hover:bg-slate-700">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-brand-accent text-slate-950 font-bold text-xs rounded-lg hover:bg-amber-400">Guardar Jugador</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EDITAR FORMATO -->
+    <div id="modal-formato" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-comic text-xl text-brand-accent">Editar Formato de Jornada</h3>
+                <button onclick="closeModalFormato()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+            </div>
+            <form onsubmit="saveFormatoFromModal(event)" class="space-y-3">
+                <input type="hidden" id="modal-formato-jornada" value="">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Nombre del Formato</label>
+                    <input type="text" id="modal-formato-nombre" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white outline-none focus:border-brand-accent">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Puntos de Construcción</label>
+                    <input type="number" id="modal-formato-puntos" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white outline-none focus:border-brand-accent">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Descripción / Reglas</label>
+                    <textarea id="modal-formato-descripcion" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white outline-none focus:border-brand-accent"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-3">
+                    <button type="button" onclick="closeModalFormato()" class="px-4 py-2 bg-slate-800 text-slate-300 font-bold text-xs rounded-lg hover:bg-slate-700">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-brand-accent text-slate-950 font-bold text-xs rounded-lg hover:bg-amber-400">Actualizar Formato</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-brand-green text-slate-950 font-bold px-4 py-3 rounded-xl shadow-2xl border border-black flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50 text-xs">
+        <i class="fa-solid fa-circle-check text-base"></i>
+        <span id="toast-message">Operación realizada con éxito</span>
+    </div>
+
+    <!-- JAVASCRIPT ENGINE -->
+    <script>
+        // Default Formats Template (10 Rounds)
+        const DEFAULT_FORMATOS = [
+            { jornada: 1, nombre: "Modern Age 300 pts", puntos: 300, descripcion: "Construcción estándar competitiva. Solo figuras con sello Modern Age activo." },
+            { jornada: 2, nombre: "Pauper Clix (Comunes/Infrecuentes)", puntos: 400, descripcion: "Solo figuras con rareza Común (C) e Infrecuente (U)." },
+            { jornada: 3, nombre: "Golden Age Libre", puntos: 500, descripcion: "Sin restricción de época. Recursos y objetos especiales permitidos." },
+            { jornada: 4, nombre: "Theme Team Obligatorio", puntos: 300, descripcion: "Todo el equipo debe compartir una palabra clave (Keyword) en común." },
+            { jornada: 5, nombre: "Cosmic War", puntos: 400, descripcion: "Figuras con la keyword Cosmic o capacidad de vuelo." },
+            { jornada: 6, nombre: "Highlander (Sin Duplicados)", puntos: 300, descripcion: "Prohibido repetir personajes o nombres en la alineación." },
+            { jornada: 7, nombre: "Battle Royale Fast Clix", puntos: 400, descripcion: "Partidas rápidas e intensas con límite de tiempo reducido por turno." },
+            { jornada: 8, nombre: "Silver Age 500", puntos: 500, descripcion: "Sets lanzados en los últimos 5 años. Sin objetos de último set." },
+            { jornada: 9, nombre: "Monsters vs Heroes", puntos: 400, descripcion: "Equipos temáticos exclusivos de Villanos/Monstruos contra Héroes." },
+            { jornada: 10, nombre: "Gran Final: Mega Clash 600", puntos: 600, descripcion: "600 puntos para la jornada decisiva de la temporada." }
+        ];
+
+        // Global State
+        let appState = {
+            adminMode: false,
+            players: [], // EMPTY INITIAL STATE
+            formatos: [...DEFAULT_FORMATOS],
+            jornadasMatches: {} // Structure: { 1: [ { mesa:1, p1Id:'', p2Id:'', score1:0, score2:0, played:false } ] }
+        };
+
+        // On Load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadOrCreateState();
+            setupJornadaSelector();
+            renderLeaderboard();
+            renderJornadaDetails();
+            renderFormatosList();
+            populateAdminForm();
+            updateAdminUI();
+        });
+
+        function loadOrCreateState() {
+            const saved = localStorage.getItem('heroclix_liga_planeta_primate_v2');
+            if (saved) {
+                try {
+                    appState = JSON.parse(saved);
+                    if (!appState.formatos) appState.formatos = [...DEFAULT_FORMATOS];
+                } catch (e) {
+                    initEmptyState();
+                }
+            } else {
+                initEmptyState();
+            }
+            updateStatsBadges();
+        }
+
+        function initEmptyState() {
+            appState.players = [];
+            appState.formatos = [...DEFAULT_FORMATOS];
+            appState.jornadasMatches = {};
+            for (let i = 1; i <= 10; i++) {
+                appState.jornadasMatches[i] = [];
+            }
+            saveState();
+        }
+
+        function saveState() {
+            localStorage.setItem('heroclix_liga_planeta_primate_v2', JSON.stringify(appState));
+            updateStatsBadges();
+        }
+
+        function updateStatsBadges() {
+            document.getElementById('stat-players-count').innerText = appState.players.length;
+            document.getElementById('admin-players-count').innerText = appState.players.length;
+
+            let totalPlayed = 0;
+            Object.keys(appState.jornadasMatches).forEach(j => {
+                totalPlayed += (appState.jornadasMatches[j] || []).filter(m => m.played).length;
+            });
+            document.getElementById('stat-matches-count').innerText = totalPlayed;
+        }
+
+        // --- ADMIN MODE TOGGLE ---
+        function toggleAdminMode() {
+            appState.adminMode = !appState.adminMode;
+            updateAdminUI();
+            showToast(appState.adminMode ? "Modo Administrador Activado" : "Modo Visitante / Lectura");
+        }
+
+        function updateAdminUI() {
+            const adminOnlyEls = document.querySelectorAll('.admin-only');
+            const modeIndicator = document.getElementById('admin-mode-indicator');
+            const toggleBtnText = document.getElementById('admin-toggle-text');
+            const lockBanner = document.getElementById('admin-lock-banner');
+
+            if (appState.adminMode) {
+                adminOnlyEls.forEach(el => el.classList.remove('hidden'));
+                modeIndicator.classList.remove('hidden');
+                toggleBtnText.innerText = "Salir Admin";
+                if(lockBanner) lockBanner.classList.add('hidden');
+            } else {
+                adminOnlyEls.forEach(el => el.classList.add('hidden'));
+                modeIndicator.classList.add('hidden');
+                toggleBtnText.innerText = "Modo Admin";
+                if(lockBanner) lockBanner.classList.remove('hidden');
+            }
+            renderAdminPlayersList();
+        }
+
+        // --- CLASIFICACIÓN / LEADERBOARD ---
+        function calculateLeaderboard() {
+            const stats = {};
+
+            appState.players.forEach(p => {
+                stats[p.id] = {
+                    id: p.id,
+                    nombre: p.nombre,
+                    alias: p.alias || '-',
+                    ptsLiga: 0,
+                    ptsVictory: 0,
+                    ptsKO: 0,
+                    pj: 0,
+                    pg: 0,
+                    pp: 0
+                };
+            });
+
+            Object.keys(appState.jornadasMatches).forEach(j => {
+                (appState.jornadasMatches[j] || []).forEach(m => {
+                    if (m.played) {
+                        const p1 = stats[m.p1Id];
+                        const p2 = stats[m.p2Id];
+
+                        if (p1 && p2) {
+                            p1.pj++; p2.pj++;
+                            p1.ptsVictory += m.score1; p1.ptsKO += m.score2;
+                            p2.ptsVictory += m.score2; p2.ptsKO += m.score1;
+
+                            const diff = m.score1 - m.score2;
+                            if (diff > 0) {
+                                p1.pg++; p2.pp++;
+                                p1.ptsLiga += 3;
+                                if (Math.abs(diff) <= 50) p2.ptsLiga += 1;
+                            } else if (diff < 0) {
+                                p2.pg++; p1.pp++;
+                                p2.ptsLiga += 3;
+                                if (Math.abs(diff) <= 50) p1.ptsLiga += 1;
+                            } else {
+                                p1.ptsLiga += 1; p2.ptsLiga += 1;
+                            }
+                        }
+                    }
+                });
+            });
+
+            return Object.values(stats).sort((a, b) => {
+                if (b.ptsLiga !== a.ptsLiga) return b.ptsLiga - a.ptsLiga;
+                if (b.ptsVictory !== a.ptsVictory) return b.ptsVictory - a.ptsVictory;
+                return b.pg - a.pg;
+            });
+        }
+
+        function renderLeaderboard() {
+            const leaderboard = calculateLeaderboard();
+            const tbody = document.getElementById('leaderboard-tbody');
+            const searchVal = document.getElementById('search-player').value.toLowerCase();
+
+            tbody.innerHTML = '';
+
+            const filtered = leaderboard.filter(p => 
+                p.nombre.toLowerCase().includes(searchVal) || p.alias.toLowerCase().includes(searchVal)
+            );
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-slate-500">No hay jugadores registrados o coincidentes. ¡Añade jugadores desde el Panel Admin!</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((p, index) => {
+                const efec = p.pj > 0 ? Math.round((p.pg / p.pj) * 100) : 0;
+                let posBadge = `<span class="font-bold text-slate-400">${index + 1}</span>`;
+
+                if (index === 0) posBadge = `<span class="w-6 h-6 inline-flex items-center justify-center bg-amber-500/20 text-brand-accent rounded-full font-black border border-brand-accent/40">1</span>`;
+                else if (index === 1) posBadge = `<span class="w-6 h-6 inline-flex items-center justify-center bg-slate-400/20 text-slate-300 rounded-full font-black border border-slate-400/40">2</span>`;
+                else if (index === 2) posBadge = `<span class="w-6 h-6 inline-flex items-center justify-center bg-amber-700/20 text-amber-500 rounded-full font-black border border-amber-700/40">3</span>`;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/40 transition-colors">
+                        <td class="py-3 px-4 text-center">${posBadge}</td>
+                        <td class="py-3 px-4 font-semibold text-white">${p.nombre}</td>
+                        <td class="py-3 px-4 text-slate-400 italic">${p.alias}</td>
+                        <td class="py-3 px-4 text-center font-black text-brand-accent bg-slate-950/40 text-sm">${p.ptsLiga}</td>
+                        <td class="py-3 px-4 text-center font-bold text-slate-200">${p.ptsVictory}</td>
+                        <td class="py-3 px-4 text-center text-slate-500">${p.ptsKO}</td>
+                        <td class="py-3 px-4 text-center text-slate-300 font-medium">${p.pj}</td>
+                        <td class="py-3 px-4 text-center font-bold text-brand-green">${p.pg}</td>
+                        <td class="py-3 px-4 text-center text-slate-400">${p.pp}</td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-2 py-0.5 text-[10px] rounded-full bg-slate-800 text-slate-300 font-bold border border-slate-700">
+                                ${efec}%
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- EMPAREJAMIENTO AUTOMÁTICO (SWISS PAIRINGS) ---
+        function generateSwissPairingsForCurrentJornada() {
+            const jNum = parseInt(document.getElementById('jornada-select').value);
+            
+            if (appState.players.length < 2) {
+                alert("Se necesitan al menos 2 jugadores para generar emparejamientos.");
+                return;
+            }
+
+            if (!confirm(`¿Generar emparejamientos automáticos para la Jornada ${jNum}? Esto sobreescribirá la ronda actual.`)) {
+                return;
+            }
+
+            // Get players sorted by ranking
+            const rankedPlayers = calculateLeaderboard();
+            const matches = [];
+            let mesa = 1;
+
+            for (let i = 0; i < rankedPlayers.length; i += 2) {
+                if (i + 1 < rankedPlayers.length) {
+                    matches.push({
+                        mesa: mesa++,
+                        p1Id: rankedPlayers[i].id,
+                        p2Id: rankedPlayers[i+1].id,
+                        score1: 0,
+                        score2: 0,
+                        played: false
+                    });
+                }
+            }
+
+            appState.jornadasMatches[jNum] = matches;
+            saveState();
+            renderJornadaDetails();
+            populateAdminMatchSelect();
+            showToast(`Emparejamientos generados para Jornada ${jNum}`);
+        }
+
+        // --- RENDER JORNADAS ---
+        function setupJornadaSelector() {
+            const select = document.getElementById('jornada-select');
+            select.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                select.innerHTML += `<option value="${i}">Jornada ${i}</option>`;
+            }
+        }
+
+        function changeJornada(delta) {
+            const select = document.getElementById('jornada-select');
+            let val = parseInt(select.value) + delta;
+            if (val < 1) val = 10;
+            if (val > 10) val = 1;
+            select.value = val;
+            renderJornadaDetails();
+        }
+
+        function renderJornadaDetails() {
+            const jNum = parseInt(document.getElementById('jornada-select').value);
+            const formato = appState.formatos.find(f => f.jornada === jNum) || DEFAULT_FORMATOS[jNum - 1];
+
+            document.getElementById('formato-jornada-badge').innerText = `Jornada ${formato.jornada}`;
+            document.getElementById('formato-puntos-tag').innerText = `${formato.puntos} Puntos`;
+            document.getElementById('formato-titulo').innerText = formato.nombre;
+            document.getElementById('formato-descripcion').innerText = formato.descripcion;
+
+            const matches = appState.jornadasMatches[jNum] || [];
+            const container = document.getElementById('matchups-container');
+            container.innerHTML = '';
+
+            let playedCount = 0;
+
+            if (matches.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 bg-slate-900 p-8 rounded-xl border border-slate-800 text-center text-slate-500 space-y-3">
+                        <i class="fa-solid fa-dice text-3xl text-slate-700"></i>
+                        <p class="text-xs">No hay emparejamientos creados para esta jornada.</p>
+                        <button onclick="generateSwissPairingsForCurrentJornada()" class="admin-only hidden px-3 py-1.5 bg-brand-purple text-white rounded text-xs font-bold">
+                            Generar Emparejamientos
+                        </button>
+                    </div>
+                `;
+            } else {
+                matches.forEach(m => {
+                    if (m.played) playedCount++;
+                    const p1 = appState.players.find(p => p.id === m.p1Id) || { nombre: 'Jugador Borrado' };
+                    const p2 = appState.players.find(p => p.id === m.p2Id) || { nombre: 'Jugador Borrado' };
+
+                    let statusBadge = `<span class="bg-slate-800 text-slate-400 text-[10px] px-2 py-0.5 rounded font-bold">Pendiente</span>`;
+                    if (m.played) {
+                        if (m.score1 > m.score2) statusBadge = `<span class="bg-brand-green/20 text-brand-green text-[10px] px-2 py-0.5 rounded font-bold">Ganó ${p1.nombre.split(' ')[0]}</span>`;
+                        else if (m.score2 > m.score1) statusBadge = `<span class="bg-brand-green/20 text-brand-green text-[10px] px-2 py-0.5 rounded font-bold">Ganó ${p2.nombre.split(' ')[0]}</span>`;
+                        else statusBadge = `<span class="bg-amber-500/20 text-amber-400 text-[10px] px-2 py-0.5 rounded font-bold">Empate</span>`;
+                    }
+
+                    container.innerHTML += `
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                            <div class="flex justify-between items-center text-xs border-b border-slate-800/80 pb-2">
+                                <span class="font-bold font-comic text-brand-accent">Mesa ${m.mesa}</span>
+                                ${statusBadge}
+                            </div>
+                            <div class="grid grid-cols-5 items-center gap-2">
+                                <div class="col-span-2 text-left">
+                                    <span class="font-bold text-xs text-white block truncate">${p1.nombre}</span>
+                                </div>
+                                <div class="col-span-1 text-center bg-slate-950 py-1 rounded border border-slate-800">
+                                    <span class="font-comic text-sm font-bold ${m.played ? 'text-brand-accent' : 'text-slate-600'}">
+                                        ${m.played ? `${m.score1} - ${m.score2}` : 'VS'}
+                                    </span>
+                                </div>
+                                <div class="col-span-2 text-right">
+                                    <span class="font-bold text-xs text-white block truncate">${p2.nombre}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('jornada-completion-status').innerText = `Estado: ${playedCount}/${matches.length} Completadas`;
+        }
+
+        // --- RENDER FORMATOS TAB ---
+        function renderFormatosList() {
+            const container = document.getElementById('formatos-list-container');
+            container.innerHTML = '';
+
+            appState.formatos.forEach(f => {
+                container.innerHTML += `
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2 relative">
+                        <div class="flex justify-between items-center">
+                            <span class="bg-slate-800 text-brand-accent text-[10px] font-bold px-2 py-0.5 rounded border border-slate-700">
+                                Jornada ${f.jornada} • ${f.puntos} Pts
+                            </span>
+                            <button onclick="openModalFormato(${f.jornada})" class="admin-only hidden text-xs text-brand-purple hover:underline font-bold">
+                                <i class="fa-solid fa-pen"></i> Editar
+                            </button>
+                        </div>
+                        <h3 class="font-comic text-lg text-white">${f.nombre}</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">${f.descripcion}</p>
+                    </div>
+                `;
+            });
+            updateAdminUI();
+        }
+
+        // --- ADMIN PLAYERS CRUD ---
+        function renderAdminPlayersList() {
+            const container = document.getElementById('admin-players-list');
+            container.innerHTML = '';
+
+            if (appState.players.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center">Sin jugadores registrados.</p>`;
+                return;
+            }
+
+            appState.players.forEach(p => {
+                container.innerHTML += `
+                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800/80 flex items-center justify-between text-xs">
+                        <div>
+                            <span class="font-bold text-slate-200 block">${p.nombre}</span>
+                            <span class="text-[10px] text-slate-500">${p.alias || 'Sin alias'}</span>
+                        </div>
+                        <div class="flex items-center gap-2 admin-only ${appState.adminMode ? '' : 'hidden'}">
+                            <button onclick="editPlayer('${p.id}')" class="text-slate-400 hover:text-brand-accent">
+                                <i class="fa-solid fa-pen text-xs"></i>
+                            </button>
+                            <button onclick="deletePlayer('${p.id}')" class="text-slate-400 hover:text-brand-red">
+                                <i class="fa-solid fa-trash text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function openModalAddPlayer() {
+            document.getElementById('modal-player-id').value = '';
+            document.getElementById('modal-player-nombre').value = '';
+            document.getElementById('modal-player-alias').value = '';
+            document.getElementById('modal-player-title').innerText = 'Añadir Nuevo Jugador';
+            document.getElementById('modal-player').classList.remove('hidden');
+        }
+
+        function editPlayer(id) {
+            const p = appState.players.find(x => x.id === id);
+            if (p) {
+                document.getElementById('modal-player-id').value = p.id;
+                document.getElementById('modal-player-nombre').value = p.nombre;
+                document.getElementById('modal-player-alias').value = p.alias || '';
+                document.getElementById('modal-player-title').innerText = 'Editar Jugador';
+                document.getElementById('modal-player').classList.remove('hidden');
+            }
+        }
+
+        function closeModalPlayer() {
+            document.getElementById('modal-player').classList.add('hidden');
+        }
+
+        function savePlayerFromModal(e) {
+            e.preventDefault();
+            const id = document.getElementById('modal-player-id').value;
+            const nombre = document.getElementById('modal-player-nombre').value.trim();
+            const alias = document.getElementById('modal-player-alias').value.trim();
+
+            if (!nombre) return;
+
+            if (id) {
+                const p = appState.players.find(x => x.id === id);
+                if (p) { p.nombre = nombre; p.alias = alias; }
+            } else {
+                appState.players.push({
+                    id: 'p_' + Date.now(),
+                    nombre: nombre,
+                    alias: alias
+                });
+            }
+
+            saveState();
+            closeModalPlayer();
+            renderLeaderboard();
+            renderAdminPlayersList();
+            populateAdminMatchSelect();
+            showToast("Jugador guardado correctamente.");
+        }
+
+        function deletePlayer(id) {
+            if (confirm("¿Seguro que deseas eliminar este jugador de la liga?")) {
+                appState.players = appState.players.filter(p => p.id !== id);
+                saveState();
+                renderLeaderboard();
+                renderAdminPlayersList();
+                populateAdminMatchSelect();
+                showToast("Jugador eliminado.");
+            }
+        }
+
+        // --- FORMAT MODAL ---
+        function openModalFormato(jornada) {
+            const f = appState.formatos.find(x => x.jornada === jornada);
+            if (f) {
+                document.getElementById('modal-formato-jornada').value = f.jornada;
+                document.getElementById('modal-formato-nombre').value = f.nombre;
+                document.getElementById('modal-formato-puntos').value = f.puntos;
+                document.getElementById('modal-formato-descripcion').value = f.descripcion;
+                document.getElementById('modal-formato').classList.remove('hidden');
+            }
+        }
+
+        function closeModalFormato() {
+            document.getElementById('modal-formato').classList.add('hidden');
+        }
+
+        function saveFormatoFromModal(e) {
+            e.preventDefault();
+            const jNum = parseInt(document.getElementById('modal-formato-jornada').value);
+            const f = appState.formatos.find(x => x.jornada === jNum);
+
+            if (f) {
+                f.nombre = document.getElementById('modal-formato-nombre').value;
+                f.puntos = parseInt(document.getElementById('modal-formato-puntos').value);
+                f.descripcion = document.getElementById('modal-formato-descripcion').value;
+
+                saveState();
+                closeModalFormato();
+                renderFormatosList();
+                renderJornadaDetails();
+                showToast("Formato actualizado.");
+            }
+        }
+
+        // --- ADMIN SCORE MATCH FORM ---
+        function populateAdminForm() {
+            const jSelect = document.getElementById('admin-jornada-select');
+            jSelect.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                jSelect.innerHTML += `<option value="${i}">Jornada ${i}</option>`;
+            }
+            populateAdminMatchSelect();
+        }
+
+        function populateAdminMatchSelect() {
+            const jNum = parseInt(document.getElementById('admin-jornada-select').value);
+            const mSelect = document.getElementById('admin-match-select');
+            mSelect.innerHTML = '';
+
+            const matches = appState.jornadasMatches[jNum] || [];
+            if (matches.length === 0) {
+                mSelect.innerHTML = `<option value="">Sin emparejamientos en esta jornada</option>`;
+            } else {
+                matches.forEach(m => {
+                    const p1 = appState.players.find(p => p.id === m.p1Id);
+                    const p2 = appState.players.find(p => p.id === m.p2Id);
+                    mSelect.innerHTML += `
+                        <option value="${m.mesa}">
+                            Mesa ${m.mesa}: ${p1 ? p1.nombre : 'P1'} vs ${p2 ? p2.nombre : 'P2'} ${m.played ? ' (Jugada)' : ''}
+                        </option>
+                    `;
+                });
+            }
+            loadSelectedMatchData();
+        }
+
+        function loadSelectedMatchData() {
+            const jNum = parseInt(document.getElementById('admin-jornada-select').value);
+            const mesaNum = parseInt(document.getElementById('admin-match-select').value);
+
+            const matches = appState.jornadasMatches[jNum] || [];
+            const match = matches.find(m => m.mesa === mesaNum);
+
+            if (match) {
+                const p1 = appState.players.find(p => p.id === match.p1Id);
+                const p2 = appState.players.find(p => p.id === match.p2Id);
+
+                document.getElementById('admin-p1-name').innerText = p1 ? p1.nombre : 'Jugador 1';
+                document.getElementById('admin-p2-name').innerText = p2 ? p2.nombre : 'Jugador 2';
+
+                document.getElementById('admin-p1-score').value = match.played ? match.score1 : '';
+                document.getElementById('admin-p2-score').value = match.played ? match.score2 : '';
+            } else {
+                document.getElementById('admin-p1-name').innerText = 'Jugador 1';
+                document.getElementById('admin-p2-name').innerText = 'Jugador 2';
+                document.getElementById('admin-p1-score').value = '';
+                document.getElementById('admin-p2-score').value = '';
+            }
+        }
+
+        function saveMatchResultAdmin(e) {
+            e.preventDefault();
+            const jNum = parseInt(document.getElementById('admin-jornada-select').value);
+            const mesaNum = parseInt(document.getElementById('admin-match-select').value);
+
+            const s1 = parseInt(document.getElementById('admin-p1-score').value) || 0;
+            const s2 = parseInt(document.getElementById('admin-p2-score').value) || 0;
+
+            const matches = appState.jornadasMatches[jNum] || [];
+            const match = matches.find(m => m.mesa === mesaNum);
+
+            if (match) {
+                match.score1 = s1;
+                match.score2 = s2;
+                match.played = true;
+
+                saveState();
+                renderLeaderboard();
+                renderJornadaDetails();
+                populateAdminMatchSelect();
+                showToast("Resultado de partida guardado.");
+            }
+        }
+
+        function resetLigaData() {
+            if (confirm("¿Estás seguro de que deseas VACIAR completamente la liga? Se eliminarán todos los jugadores y resultados.")) {
+                initEmptyState();
+                renderLeaderboard();
+                renderJornadaDetails();
+                renderAdminPlayersList();
+                populateAdminMatchSelect();
+                showToast("Liga vaciada y reiniciada.");
+            }
+        }
+
+        // --- BACKUP & SYNC ---
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `heroclix_liga_planeta_primate_${new Date().toISOString().slice(0,10)}.json`);
+            dlAnchorElem.click();
+        }
+
+        function importData(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.players !== undefined && parsed.jornadasMatches !== undefined) {
+                        appState = parsed;
+                        saveState();
+                        renderLeaderboard();
+                        renderJornadaDetails();
+                        renderFormatosList();
+                        populateAdminForm();
+                        showToast("Liga cargada correctamente desde JSON.");
+                    } else {
+                        alert("El archivo JSON no es válido para este formato de Liga.");
+                    }
+                } catch (err) {
+                    alert("Error al leer el archivo JSON.");
+                }
+            };
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0]);
+            }
+        }
+
+        // --- NAVIGATION TABS & TOAST ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                el.classList.remove('bg-slate-800', 'text-white', 'border-brand-accent');
+                el.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            activeBtn.classList.add('bg-slate-800', 'text-white', 'border-brand-accent');
+            activeBtn.classList.remove('text-slate-400');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>

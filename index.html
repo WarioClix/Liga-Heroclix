@@ -48,12 +48,12 @@
                         <p class="text-xs text-gray-400 font-medium tracking-wide uppercase">Planeta Primate • Edición Especial</p>
                     </div>
                 </div>
-                <!-- Menú de navegación principal -->
-                <div class="hidden md:flex space-x-1">
-                    <button onclick="switchTab('standings')" id="nav-standings" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition bg-brand-accent text-black"><i class="fa-solid fa-trophy mr-1.5"></i> Clasificación</button>
-                    <button onclick="switchTab('rounds')" id="nav-rounds" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-gray-800"><i class="fa-solid fa-calendar-days mr-1.5"></i> Jornadas</button>
-                    <button onclick="switchTab('rules')" id="nav-rules" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-gray-800"><i class="fa-solid fa-book-open mr-1.5"></i> Formatos y Normativa</button>
-                    <button onclick="switchTab('admin')" id="nav-admin" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-gray-800"><i class="fa-solid fa-gears mr-1.5"></i> Panel Admin</button>
+                <!-- Menú de navegación principal con control directo -->
+                <div class="flex space-x-1">
+                    <button type="button" onclick="openTab('standings')" id="btn-nav-standings" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition bg-brand-accent text-black"><i class="fa-solid fa-trophy mr-1.5"></i> Clasificación</button>
+                    <button type="button" onclick="openTab('rounds')" id="btn-nav-rounds" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-gray-800"><i class="fa-solid fa-calendar-days mr-1.5"></i> Jornadas</button>
+                    <button type="button" onclick="openTab('rules')" id="btn-nav-rules" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-gray-800"><i class="fa-solid fa-book-open mr-1.5"></i> Formatos y Normativa</button>
+                    <button type="button" onclick="openTab('admin')" id="btn-nav-admin" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-gray-800"><i class="fa-solid fa-gears mr-1.5"></i> Panel Admin</button>
                 </div>
             </div>
         </div>
@@ -64,7 +64,11 @@
         
         <!-- VISTA 1: CLASIFICACIÓN -->
         <div id="view-standings" class="view-section">
-            <h1 class="text-4xl font-comic text-brand-accent mb-6 flex items-center"><i class="fa-solid fa-trophy mr-3"></i> Clasificación General</h1>
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                <h1 class="text-4xl font-comic text-brand-accent flex items-center"><i class="fa-solid fa-trophy mr-3"></i> Clasificación General</h1>
+                <a href="https://hcunits.net" target="_blank" rel="noopener noreferrer" class="bg-gray-800 hover:bg-gray-700 text-brand-accent border border-gray-700 px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center w-fit"><i class="fa-solid fa-external-link-alt mr-2"></i> Abrir HCUnits.net</a>
+            </div>
+            
             <div class="bg-brand-card rounded-xl border border-gray-800 shadow-xl overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
@@ -72,6 +76,7 @@
                             <tr class="bg-gray-900/80 text-gray-400 text-xs uppercase tracking-wider border-b border-gray-800">
                                 <th class="py-4 px-4 text-center w-16">Pos</th>
                                 <th class="py-4 px-6">Jugador</th>
+                                <th class="py-4 px-4 text-center">Lista HCUnits</th>
                                 <th class="py-4 px-4 text-center">Ptos Liga</th>
                                 <th class="py-4 px-4 text-center">J</th>
                                 <th class="py-4 px-4 text-center">G</th>
@@ -97,12 +102,12 @@
                     <p id="round-format-banner" class="text-brand-accent font-semibold text-sm mt-1">Formato de la jornada...</p>
                 </div>
                 <select id="round-selector" onchange="changeActiveRound(this.value)" class="bg-brand-card border border-gray-700 text-white rounded-lg px-4 py-2 font-semibold focus:outline-none focus:border-brand-accent">
-                    <!-- Opciones del 1 al 10 -->
+                    <!-- Opciones de rondas -->
                 </select>
             </div>
             
             <div id="rounds-container" class="space-y-4">
-                <!-- Emparejamientos de la jornada activa -->
+                <!-- Emparejamientos -->
             </div>
         </div>
 
@@ -110,28 +115,39 @@
         <div id="view-rules" class="view-section hidden">
             <h1 class="text-4xl font-comic text-brand-accent mb-6 flex items-center"><i class="fa-solid fa-book-open mr-3"></i> Sistema de Puntuación y Formatos</h1>
             
-            <!-- Caja de Puntuación -->
-            <div class="bg-brand-card p-6 rounded-xl border border-gray-800 shadow-xl mb-8">
-                <h2 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-star text-brand-accent mr-2"></i> Sistema de Puntuación Oficial</h2>
-                <ul class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-300">
-                    <li class="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                        <span class="block text-brand-accent font-bold text-lg">+1 Punto</span>
-                        Por asistir y disputar la jornada.
-                    </li>
-                    <li class="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                        <span class="block text-green-400 font-bold text-lg">+3 Puntos</span>
-                        Por conseguir la victoria en el encuentro.
-                    </li>
-                    <li class="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                        <span class="block text-red-400 font-bold text-lg">-1 Punto</span>
-                        Sanción por no presentarse (Default).
-                    </li>
-                </ul>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Puntuación -->
+                <div class="bg-brand-card p-6 rounded-xl border border-gray-800 shadow-xl">
+                    <h2 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-star text-brand-accent mr-2"></i> Puntuación Oficial</h2>
+                    <ul class="space-y-3 text-sm text-gray-300">
+                        <li class="flex justify-between items-center bg-gray-900 p-3 rounded-lg border border-gray-800">
+                            <span>Asistencia a la jornada</span>
+                            <span class="text-brand-accent font-bold">+1 Punto</span>
+                        </li>
+                        <li class="flex justify-between items-center bg-gray-900 p-3 rounded-lg border border-gray-800">
+                            <span>Victoria en el encuentro</span>
+                            <span class="text-green-400 font-bold">+3 Puntos</span>
+                        </li>
+                        <li class="flex justify-between items-center bg-gray-900 p-3 rounded-lg border border-gray-800">
+                            <span>No presentado (Default)</span>
+                            <span class="text-red-400 font-bold">-1 Punto</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Herramientas HCUnits -->
+                <div class="bg-brand-card p-6 rounded-xl border border-gray-800 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-shield-halved text-brand-blue mr-2"></i> Herramienta de Listas</h2>
+                        <p class="text-sm text-gray-400 mb-4">Utiliza la plataforma oficial HCUnits para diseñar, validar y compartir tus ejércitos de HeroClix para cada formato de la liga en Planeta Primate.</p>
+                    </div>
+                    <a href="https://hcunits.net" target="_blank" rel="noopener noreferrer" class="bg-brand-blue hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg text-center transition block"><i class="fa-solid fa-external-link-alt mr-2"></i> Ir a HCUnits Builder</a>
+                </div>
             </div>
 
             <h2 class="text-2xl font-comic text-brand-accent mb-4">Los 10 Formatos de la Liga</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8" id="formats-grid">
-                <!-- Se inyectan los 10 formatos -->
+                <!-- Formatos -->
             </div>
         </div>
 
@@ -139,7 +155,7 @@
         <div id="view-admin" class="view-section hidden">
             <div id="admin-login-container" class="max-w-md mx-auto bg-brand-card p-8 rounded-xl border border-gray-800 shadow-xl mt-12">
                 <h2 class="text-3xl font-comic text-brand-purple mb-4 text-center"><i class="fa-solid fa-lock mr-2"></i> Acceso Administrador</h2>
-                <p class="text-sm text-gray-400 mb-6 text-center">Introduce la contraseña de la organización para gestionar la liga.</p>
+                <p class="text-sm text-gray-400 mb-6 text-center">Introduce la contraseña de Planeta Primate para gestionar la liga.</p>
                 <form onsubmit="handleAdminLogin(event)" class="space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Contraseña</label>
@@ -152,21 +168,22 @@
             <div id="admin-dashboard" class="hidden space-y-8">
                 <div class="flex items-center justify-between bg-brand-card p-6 rounded-xl border border-gray-800">
                     <div>
-                        <h2 class="text-3xl font-comic text-brand-purple">Panel de Control de Administrador</h2>
-                        <p class="text-sm text-gray-400">Gestiona los participantes y registra resultados o penalizaciones por incomparecencia.</p>
+                        <h2 class="text-3xl font-comic text-brand-purple">Panel de Control - Planeta Primate</h2>
+                        <p class="text-sm text-gray-400">Inscribe jugadores, añade sus enlaces de HCUnits y registra resultados.</p>
                     </div>
-                    <button onclick="handleAdminLogout()" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded-lg text-sm font-semibold border border-red-500/30 transition"><i class="fa-solid fa-right-from-bracket mr-2"></i> Cerrar Sesión</button>
+                    <button type="button" onclick="handleAdminLogout()" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded-lg text-sm font-semibold border border-red-500/30 transition"><i class="fa-solid fa-right-from-bracket mr-2"></i> Cerrar Sesión</button>
                 </div>
 
-                <!-- Gestión de Jugadores -->
+                <!-- Gestión de Jugadores y HCUnits -->
                 <div class="bg-brand-card p-6 rounded-xl border border-gray-800 shadow-xl">
-                    <h3 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-users mr-2 text-brand-accent"></i> Inscripción de Participantes</h3>
-                    <form onsubmit="addPlayer(event)" class="flex gap-3 mb-6">
+                    <h3 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-users mr-2 text-brand-accent"></i> Inscripción de Participantes y Listas HCUnits</h3>
+                    <form onsubmit="addPlayer(event)" class="flex flex-col sm:flex-row gap-3 mb-6">
                         <input type="text" id="new-player-name" placeholder="Nombre del jugador..." required class="flex-grow bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
-                        <button type="submit" class="bg-brand-accent hover:bg-amber-600 text-black font-bold px-6 py-2 rounded-lg transition"><i class="fa-solid fa-user-plus mr-1"></i> Añadir Jugador</button>
+                        <input type="url" id="new-player-hcunits" placeholder="Enlace de la lista en HCUnits (opcional)..." class="flex-grow bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
+                        <button type="submit" class="bg-brand-accent hover:bg-amber-600 text-black font-bold px-6 py-2 rounded-lg transition"><i class="fa-solid fa-user-plus mr-1"></i> Añadir</button>
                     </form>
                     <div id="admin-players-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                        <!-- Lista de jugadores -->
+                        <!-- Lista de jugadores en admin -->
                     </div>
                 </div>
 
@@ -177,11 +194,11 @@
                         <div class="flex gap-2">
                             <select id="admin-round-select" onchange="renderAdminMatches(this.value)" class="bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-1.5 text-sm font-semibold focus:outline-none">
                             </select>
-                            <button onclick="generatePairings()" class="bg-brand-blue hover:bg-blue-600 text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition"><i class="fa-solid fa-shuffle mr-1"></i> Generar Emparejamientos</button>
+                            <button type="button" onclick="generatePairings()" class="bg-brand-blue hover:bg-blue-600 text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition"><i class="fa-solid fa-shuffle mr-1"></i> Generar Emparejamientos</button>
                         </div>
                     </div>
                     <div id="admin-matches-container" class="space-y-4">
-                        <!-- Partidos de la jornada -->
+                        <!-- Partidos -->
                     </div>
                 </div>
             </div>
@@ -210,27 +227,39 @@
             10: "Jornada 10: Gran Final de Maestros (400 Puntos - Formato Cerrado)"
         };
 
-        let leagueData = JSON.parse(localStorage.getItem('heroclix_league_data')) || {
+        let leagueData = JSON.parse(localStorage.getItem('primate_heroclix_league_data')) || {
             players: [],
             rounds: {}
         };
 
         let currentActiveRound = 1;
 
-        function saveData() {
-            localStorage.setItem('heroclix_league_data', JSON.stringify(leagueData));
+        // Función directa para alternar pestañas del menú de forma instantánea
+        function openTab(tabId) {
+            const tabs = ['standings', 'rounds', 'rules', 'admin'];
+            
+            tabs.forEach(t => {
+                const btn = document.getElementById('btn-nav-' + t);
+                const sec = document.getElementById('view-' + t);
+                
+                if (t === tabId) {
+                    if (sec) sec.classList.remove('hidden');
+                    if (btn) {
+                        btn.className = "nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition bg-brand-accent text-black";
+                    }
+                } else {
+                    if (sec) sec.classList.add('hidden');
+                    if (btn) {
+                        btn.className = "nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-gray-800";
+                    }
+                }
+            });
+            
             updateUI();
         }
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-brand-accent', 'text-black', 'text-gray-300'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.add('text-gray-300'));
-            
-            document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
-            document.getElementById('view-' + tabId).classList.remove('hidden');
-            document.getElementById('nav-' + tabId).classList.add('bg-brand-accent', 'text-black');
-            document.getElementById('nav-' + tabId).classList.remove('text-gray-300');
-            
+        function saveData() {
+            localStorage.setItem('primate_heroclix_league_data', JSON.stringify(leagueData));
             updateUI();
         }
 
@@ -255,11 +284,14 @@
         function addPlayer(e) {
             e.preventDefault();
             const nameInput = document.getElementById('new-player-name');
+            const hcunitsInput = document.getElementById('new-player-hcunits');
             const name = nameInput.value.trim();
+            const hcunits = hcunitsInput.value.trim();
             if(!name) return;
 
-            leagueData.players.push({ id: Date.now(), name: name });
+            leagueData.players.push({ id: Date.now(), name: name, hcunits: hcunits });
             nameInput.value = '';
+            hcunitsInput.value = '';
             saveData();
             updateAdminUI();
         }
@@ -290,7 +322,7 @@
                     matches.push({
                         p1: players[i].name,
                         p2: players[i+1].name,
-                        status1: 'normal', // normal, win, np (no presentado)
+                        status1: 'normal',
                         status2: 'normal',
                         score1: '',
                         score2: ''
@@ -333,31 +365,29 @@
             }
         }
 
-        // --- CÁLCULO DE PUNTUACIÓN SEGÚN REGLAS ---
         function calculateStandings() {
             let stats = {};
             leagueData.players.forEach(p => {
-                stats[p.name] = { name: p.name, pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, tp: 0 };
+                stats[p.name] = { name: p.name, hcunits: p.hcunits || '', pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, tp: 0 };
             });
 
             Object.values(leagueData.rounds).forEach(roundMatches => {
                 roundMatches.forEach(m => {
-                    // Procesar Jugador 1
-                    if(!stats[m.p1]) stats[m.p1] = { name: m.p1, pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, tp: 0 };
+                    if(!stats[m.p1]) stats[m.p1] = { name: m.p1, hcunits: '', pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, tp: 0 };
                     
                     if(m.status1 === 'np') {
                         stats[m.p1].np++;
-                        stats[m.p1].pts -= 1; // -1 por no presentarse
+                        stats[m.p1].pts -= 1;
                     } else if(m.score1 !== '' && m.score2 !== '' && m.p2 !== 'DESCANSA (BYE)') {
                         stats[m.p1].played++;
-                        stats[m.p1].pts += 1; // +1 por asistir
+                        stats[m.p1].pts += 1;
                         stats[m.p1].tp += m.score1;
 
                         if(m.status1 === 'win' || (m.score1 > m.score2 && m.status2 !== 'np')) {
-                            stats[m.p1].pts += 3; // +3 por victoria
+                            stats[m.p1].pts += 3;
                             stats[m.p1].won++;
                         } else if(m.status2 === 'np') {
-                            stats[m.p1].pts += 3; // Victoria por incomparecencia rival
+                            stats[m.p1].pts += 3;
                             stats[m.p1].won++;
                         } else if(m.score1 === m.score2) {
                             stats[m.p1].drawn++;
@@ -366,27 +396,26 @@
                         }
                     } else if(m.p2 === 'DESCANSA (BYE)' && m.score1 !== '') {
                         stats[m.p1].played++;
-                        stats[m.p1].pts += 1 + 3; // Asistencia + Victoria automática por bye
+                        stats[m.p1].pts += 1 + 3;
                         stats[m.p1].won++;
                     }
 
-                    // Procesar Jugador 2 (si no es BYE)
                     if(m.p2 !== 'DESCANSA (BYE)') {
-                        if(!stats[m.p2]) stats[m.p2] = { name: m.p2, pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, tp: 0 };
+                        if(!stats[m.p2]) stats[m.p2] = { name: m.p2, hcunits: '', pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, tp: 0 };
 
                         if(m.status2 === 'np') {
                             stats[m.p2].np++;
-                            stats[m.p2].pts -= 1; // -1 por no presentarse
+                            stats[m.p2].pts -= 1;
                         } else if(m.score1 !== '' && m.score2 !== '') {
                             stats[m.p2].played++;
-                            stats[m.p2].pts += 1; // +1 por asistir
+                            stats[m.p2].pts += 1;
                             stats[m.p2].tp += m.score2;
 
                             if(m.status2 === 'win' || (m.score2 > m.score1 && m.status1 !== 'np')) {
-                                stats[m.p2].pts += 3; // +3 por victoria
+                                stats[m.p2].pts += 3;
                                 stats[m.p2].won++;
                             } else if(m.status1 === 'np') {
-                                stats[m.p2].pts += 3; // Victoria por incomparecencia rival
+                                stats[m.p2].pts += 3;
                                 stats[m.p2].won++;
                             } else if(m.score1 === m.score2) {
                                 stats[m.p2].drawn++;
@@ -402,55 +431,60 @@
         }
 
         function updateUI() {
-            // 1. Clasificación
             const tbody = document.getElementById('standings-tbody');
             const standings = calculateStandings();
             
-            if(standings.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="py-6 px-4 text-center text-gray-500">No hay participantes registrados todavía.</td></tr>`;
-            } else {
-                tbody.innerHTML = standings.map((st, index) => `
-                    <tr class="hover:bg-gray-800/50 transition">
-                        <td class="py-3 px-4 text-center font-bold text-brand-accent">${index + 1}</td>
-                        <td class="py-3 px-6 font-semibold text-white">${st.name}</td>
-                        <td class="py-3 px-4 text-center font-bold text-brand-accent">${st.pts}</td>
-                        <td class="py-3 px-4 text-center text-gray-300">${st.played}</td>
-                        <td class="py-3 px-4 text-center text-green-400">${st.won}</td>
-                        <td class="py-3 px-4 text-center text-yellow-400">${st.drawn}</td>
-                        <td class="py-3 px-4 text-center text-red-400">${st.lost}</td>
-                        <td class="py-3 px-4 text-center text-orange-400">${st.np}</td>
-                        <td class="py-3 px-4 text-center text-gray-400">${st.tp}</td>
-                    </tr>
-                `).join('');
+            if(tbody) {
+                if(standings.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="10" class="py-6 px-4 text-center text-gray-500">No hay participantes registrados todavía.</td></tr>`;
+                } else {
+                    tbody.innerHTML = standings.map((st, index) => `
+                        <tr class="hover:bg-gray-800/50 transition">
+                            <td class="py-3 px-4 text-center font-bold text-brand-accent">${index + 1}</td>
+                            <td class="py-3 px-6 font-semibold text-white">${st.name}</td>
+                            <td class="py-3 px-4 text-center">
+                                ${st.hcunits ? `<a href="${st.hcunits}" target="_blank" rel="noopener noreferrer" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-3 py-1 rounded-lg text-xs font-bold border border-blue-500/30 inline-flex items-center"><i class="fa-solid fa-link mr-1.5"></i> Ver Lista</a>` : `<span class="text-gray-600 text-xs">-</span>`}
+                            </td>
+                            <td class="py-3 px-4 text-center font-bold text-brand-accent">${st.pts}</td>
+                            <td class="py-3 px-4 text-center text-gray-300">${st.played}</td>
+                            <td class="py-3 px-4 text-center text-green-400">${st.won}</td>
+                            <td class="py-3 px-4 text-center text-yellow-400">${st.drawn}</td>
+                            <td class="py-3 px-4 text-center text-red-400">${st.lost}</td>
+                            <td class="py-3 px-4 text-center text-orange-400">${st.np}</td>
+                            <td class="py-3 px-4 text-center text-gray-400">${st.tp}</td>
+                        </tr>
+                    `).join('');
+                }
             }
 
-            // 2. Selector de Rondas
             let roundOptionsHtml = '';
             for(let i=1; i<=10; i++) {
                 roundOptionsHtml += `<option value="${i}" ${currentActiveRound == i ? 'selected' : ''}>Jornada ${i}</option>`;
             }
-            document.getElementById('round-selector').innerHTML = roundOptionsHtml;
-            document.getElementById('round-format-banner').innerText = roundFormats[currentActiveRound];
-
-            // 3. Partidos públicos
-            const roundsContainer = document.getElementById('rounds-container');
-            const currentMatches = leagueData.rounds[currentActiveRound] || [];
+            const roundSelect = document.getElementById('round-selector');
+            if(roundSelect) roundSelect.innerHTML = roundOptionsHtml;
             
-            if(currentMatches.length === 0) {
-                roundsContainer.innerHTML = `<div class="bg-brand-card p-6 rounded-xl border border-gray-800 text-gray-400 text-center">No hay emparejamientos generados para esta jornada.</div>`;
-            } else {
-                roundsContainer.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">` + currentMatches.map(m => `
-                    <div class="bg-brand-card p-4 rounded-xl border border-gray-800 flex items-center justify-between shadow">
-                        <div class="flex-grow text-right pr-4 font-semibold text-white ${m.status1 === 'np' ? 'line-through text-red-400' : ''}">${m.p1} ${m.status1 === 'np' ? '(No Presentado)' : ''}</div>
-                        <div class="bg-gray-900 px-4 py-2 rounded-lg border border-gray-700 text-brand-accent font-bold tracking-widest text-center min-w-[90px]">
-                            ${m.score1 !== '' ? m.score1 : '-'} : ${m.score2 !== '' ? m.score2 : '-'}
+            const roundBanner = document.getElementById('round-format-banner');
+            if(roundBanner) roundBanner.innerText = roundFormats[currentActiveRound];
+
+            const roundsContainer = document.getElementById('rounds-container');
+            if(roundsContainer) {
+                const currentMatches = leagueData.rounds[currentActiveRound] || [];
+                if(currentMatches.length === 0) {
+                    roundsContainer.innerHTML = `<div class="bg-brand-card p-6 rounded-xl border border-gray-800 text-gray-400 text-center">No hay emparejamientos generados para esta jornada.</div>`;
+                } else {
+                    roundsContainer.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">` + currentMatches.map(m => `
+                        <div class="bg-brand-card p-4 rounded-xl border border-gray-800 flex items-center justify-between shadow">
+                            <div class="flex-grow text-right pr-4 font-semibold text-white ${m.status1 === 'np' ? 'line-through text-red-400' : ''}">${m.p1}</div>
+                            <div class="bg-gray-900 px-4 py-2 rounded-lg border border-gray-700 text-brand-accent font-bold tracking-widest text-center min-w-[90px]">
+                                ${m.score1 !== '' ? m.score1 : '-'} : ${m.score2 !== '' ? m.score2 : '-'}
+                            </div>
+                            <div class="flex-grow text-left pl-4 font-semibold text-white ${m.status2 === 'np' ? 'line-through text-red-400' : ''}">${m.p2}</div>
                         </div>
-                        <div class="flex-grow text-left pl-4 font-semibold text-white ${m.status2 === 'np' ? 'line-through text-red-400' : ''}">${m.p2} ${m.status2 === 'np' ? '(No Presentado)' : ''}</div>
-                    </div>
-                `).join('') + `</div>`;
+                    `).join('') + `</div>`;
+                }
             }
 
-            // 4. Formatos
             const formatsGrid = document.getElementById('formats-grid');
             if(formatsGrid) {
                 let formatsHtml = '';
@@ -476,15 +510,20 @@
 
         function updateAdminUI() {
             const adminPlayersList = document.getElementById('admin-players-list');
-            if(leagueData.players.length === 0) {
-                adminPlayersList.innerHTML = `<p class="text-sm text-gray-500 col-span-full">Aún no hay jugadores añadidos.</p>`;
-            } else {
-                adminPlayersList.innerHTML = leagueData.players.map(p => `
-                    <div class="bg-gray-900 p-3 rounded-lg border border-gray-800 flex items-center justify-between">
-                        <span class="font-medium text-white">${p.name}</span>
-                        <button onclick="deletePlayer(${p.id})" class="text-red-400 hover:text-red-300 text-sm p-1"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                `).join('');
+            if(adminPlayersList) {
+                if(leagueData.players.length === 0) {
+                    adminPlayersList.innerHTML = `<p class="text-sm text-gray-500 col-span-full">Aún no hay jugadores añadidos.</p>`;
+                } else {
+                    adminPlayersList.innerHTML = leagueData.players.map(p => `
+                        <div class="bg-gray-900 p-3 rounded-lg border border-gray-800 flex items-center justify-between">
+                            <div>
+                                <span class="font-medium text-white block">${p.name}</span>
+                                <span class="text-xs text-blue-400 truncate max-w-[150px] block">${p.hcunits ? p.hcunits : 'Sin enlace HCUnits'}</span>
+                            </div>
+                            <button type="button" onclick="deletePlayer(${p.id})" class="text-red-400 hover:text-red-300 text-sm p-1"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `).join('');
+                }
             }
 
             let adminRoundSelectOpts = '';
@@ -492,15 +531,18 @@
                 adminRoundSelectOpts += `<option value="${i}">Jornada ${i} - ${roundFormats[i].split(': ')[1]}</option>`;
             }
             const adminSelectElem = document.getElementById('admin-round-select');
-            const selectedVal = adminSelectElem.value || 1;
-            adminSelectElem.innerHTML = adminRoundSelectOpts;
-            adminSelectElem.value = selectedVal;
-
-            renderAdminMatches(selectedVal);
+            if(adminSelectElem) {
+                const selectedVal = adminSelectElem.value || 1;
+                adminSelectElem.innerHTML = adminRoundSelectOpts;
+                adminSelectElem.value = selectedVal;
+                renderAdminMatches(selectedVal);
+            }
         }
 
         function renderAdminMatches(roundNum) {
             const container = document.getElementById('admin-matches-container');
+            if(!container) return;
+            
             const matches = leagueData.rounds[roundNum] || [];
 
             if(matches.length === 0) {
@@ -533,6 +575,7 @@
             `).join('');
         }
 
+        // Inicializar la interfaz de la aplicación
         updateUI();
     </script>
 </body>

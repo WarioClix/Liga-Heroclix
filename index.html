@@ -77,15 +77,12 @@
                                 <th class="py-4 px-3 text-center w-14">Pos</th>
                                 <th class="py-4 px-4">Jugador</th>
                                 <th class="py-4 px-3 text-center">Lista HCUnits</th>
-                                <th class="py-4 px-3 text-center text-brand-accent">Ptos Liga</th>
-                                <th class="py-4 px-3 text-center">J</th>
-                                <th class="py-4 px-3 text-center text-green-400">G</th>
-                                <th class="py-4 px-3 text-center text-yellow-400">E</th>
-                                <th class="py-4 px-3 text-center text-red-400">P</th>
-                                <th class="py-4 px-3 text-center text-orange-400">NP</th>
                                 <th class="py-4 px-4 text-center text-blue-300">Puntos a Favor</th>
                                 <th class="py-4 px-4 text-center text-purple-300">Puntos en Contra</th>
-                                <th class="py-4 px-4 text-center text-brand-accent">Diferencia</th>
+                                <th class="py-4 px-3 text-center">Jugados</th>
+                                <th class="py-4 px-3 text-center text-green-400">Ganados</th>
+                                <th class="py-4 px-3 text-center text-red-400">Perdidos</th>
+                                <th class="py-4 px-3 text-center text-brand-accent font-bold">Ptos Liga</th>
                             </tr>
                         </thead>
                         <tbody id="standings-tbody" class="divide-y divide-gray-800 text-sm">
@@ -375,9 +372,7 @@
                     pts: 0, 
                     played: 0, 
                     won: 0, 
-                    drawn: 0, 
                     lost: 0, 
-                    np: 0, 
                     pf: 0, 
                     pc: 0 
                 };
@@ -385,12 +380,11 @@
 
             Object.values(leagueData.rounds).forEach(roundMatches => {
                 roundMatches.forEach(m => {
-                    if(!stats[m.p1]) stats[m.p1] = { name: m.p1, hcunits: '', pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, pf: 0, pc: 0 };
+                    if(!stats[m.p1]) stats[m.p1] = { name: m.p1, hcunits: '', pts: 0, played: 0, won: 0, lost: 0, pf: 0, pc: 0 };
                     
                     // --- JUGADOR 1 ---
                     if(m.status1 === 'np') {
-                        stats[m.p1].np++;
-                        stats[m.p1].pts -= 1; 
+                        stats[m.p1].pts -= 1; // -1 punto por no presentado
                     } else if(m.score1 !== '' && m.score2 !== '' && m.p2 !== 'DESCANSA (BYE)') {
                         stats[m.p1].played++;
                         stats[m.p1].pts += 1; // +1 punto participación
@@ -404,7 +398,7 @@
                             stats[m.p1].pts += 3; // +3 puntos si rival no se presenta
                             stats[m.p1].won++;
                         } else if(Number(m.score1) === Number(m.score2)) {
-                            stats[m.p1].drawn++;
+                            // Empate (opcional si se da)
                         } else {
                             stats[m.p1].lost++;
                         }
@@ -417,11 +411,10 @@
 
                     // --- JUGADOR 2 ---
                     if(m.p2 !== 'DESCANSA (BYE)') {
-                        if(!stats[m.p2]) stats[m.p2] = { name: m.p2, hcunits: '', pts: 0, played: 0, won: 0, drawn: 0, lost: 0, np: 0, pf: 0, pc: 0 };
+                        if(!stats[m.p2]) stats[m.p2] = { name: m.p2, hcunits: '', pts: 0, played: 0, won: 0, lost: 0, pf: 0, pc: 0 };
 
                         if(m.status2 === 'np') {
-                            stats[m.p2].np++;
-                            stats[m.p2].pts -= 1; 
+                            stats[m.p2].pts -= 1; // -1 punto por no presentado
                         } else if(m.score1 !== '' && m.score2 !== '') {
                             stats[m.p2].played++;
                             stats[m.p2].pts += 1; // +1 punto participación
@@ -435,7 +428,7 @@
                                 stats[m.p2].pts += 3; // +3 puntos si rival no se presenta
                                 stats[m.p2].won++;
                             } else if(Number(m.score1) === Number(m.score2)) {
-                                stats[m.p2].drawn++;
+                                // Empate
                             } else {
                                 stats[m.p2].lost++;
                             }
@@ -444,7 +437,7 @@
                 });
             });
 
-            // Ordenar por Puntos de Liga y luego por Diferencial de Puntos
+            // Ordenar por Puntos de Liga (descendente), luego por Diferencial de Puntos
             return Object.values(stats).sort((a, b) => {
                 const diffA = a.pf - a.pc;
                 const diffB = b.pf - b.pc;
@@ -458,32 +451,23 @@
             
             if(tbody) {
                 if(standings.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="12" class="py-6 px-4 text-center text-gray-500">No hay participantes registrados todavía.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="9" class="py-6 px-4 text-center text-gray-500">No hay participantes registrados todavía.</td></tr>`;
                 } else {
-                    tbody.innerHTML = standings.map((st, index) => {
-                        const diff = st.pf - st.pc;
-                        const diffFormatted = diff > 0 ? `+${diff}` : diff;
-                        const diffColor = diff > 0 ? 'text-green-400 font-bold' : (diff < 0 ? 'text-red-400 font-bold' : 'text-gray-400');
-
-                        return `
-                            <tr class="hover:bg-gray-800/50 transition">
-                                <td class="py-3 px-3 text-center font-bold text-brand-accent">${index + 1}</td>
-                                <td class="py-3 px-4 font-semibold text-white">${st.name}</td>
-                                <td class="py-3 px-3 text-center">
-                                    ${st.hcunits ? `<a href="${st.hcunits}" target="_blank" rel="noopener noreferrer" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-3 py-1 rounded-lg text-xs font-bold border border-blue-500/30 inline-flex items-center"><i class="fa-solid fa-link mr-1.5"></i> Ver Lista</a>` : `<span class="text-gray-600 text-xs">-</span>`}
-                                </td>
-                                <td class="py-3 px-3 text-center font-bold text-brand-accent text-base">${st.pts}</td>
-                                <td class="py-3 px-3 text-center text-gray-300">${st.played}</td>
-                                <td class="py-3 px-3 text-center text-green-400">${st.won}</td>
-                                <td class="py-3 px-3 text-center text-yellow-400">${st.drawn}</td>
-                                <td class="py-3 px-3 text-center text-red-400">${st.lost}</td>
-                                <td class="py-3 px-3 text-center text-orange-400">${st.np}</td>
-                                <td class="py-3 px-4 text-center text-blue-300 font-semibold">${st.pf}</td>
-                                <td class="py-3 px-4 text-center text-purple-300 font-semibold">${st.pc}</td>
-                                <td class="py-3 px-4 text-center ${diffColor}">${diffFormatted}</td>
-                            </tr>
-                        `;
-                    }).join('');
+                    tbody.innerHTML = standings.map((st, index) => `
+                        <tr class="hover:bg-gray-800/50 transition">
+                            <td class="py-3 px-3 text-center font-bold text-brand-accent">${index + 1}</td>
+                            <td class="py-3 px-4 font-semibold text-white">${st.name}</td>
+                            <td class="py-3 px-3 text-center">
+                                ${st.hcunits ? `<a href="${st.hcunits}" target="_blank" rel="noopener noreferrer" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-3 py-1 rounded-lg text-xs font-bold border border-blue-500/30 inline-flex items-center"><i class="fa-solid fa-link mr-1.5"></i> Ver Lista</a>` : `<span class="text-gray-600 text-xs">-</span>`}
+                            </td>
+                            <td class="py-3 px-4 text-center text-blue-300 font-semibold">${st.pf}</td>
+                            <td class="py-3 px-4 text-center text-purple-300 font-semibold">${st.pc}</td>
+                            <td class="py-3 px-3 text-center text-gray-300">${st.played}</td>
+                            <td class="py-3 px-3 text-center text-green-400">${st.won}</td>
+                            <td class="py-3 px-3 text-center text-red-400">${st.lost}</td>
+                            <td class="py-3 px-3 text-center font-bold text-brand-accent text-base">${st.pts}</td>
+                        </tr>
+                    `).join('');
                 }
             }
 
